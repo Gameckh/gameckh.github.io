@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword"  content="">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+          调研报告：表格文档版本管理 - KevinChen&#39;s Blog
+        
+    </title>
+
+    <link rel="canonical" href="https://gameckh.github.io/2022/07/12/research-report-version-control-of-spreadsheets/">
+
+    <!-- Bootstrap Core CSS -->
+    
+<link rel="stylesheet" href="/css/bootstrap.min.css">
+
+
+    <!-- Custom CSS -->
+    
+<link rel="stylesheet" href="/css/hux-blog.min.css">
+
+
+    <!-- Pygments Highlight CSS -->
+    
+<link rel="stylesheet" href="/css/highlight.css">
+
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">KevinChen&#39;s Blog</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About My Blog</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archives/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    
+<!-- Image to hack wechat -->
+<!-- <img src="https://gameckh.github.io/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="{{ site.baseurl }}/{% if page.header-img %}{{ page.header-img }}{% else %}{{ site.header-img }}{% endif %}" width="0" height="0"> -->
+
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        background-image: url('post-bg.jpg')
+    }
+</style>
+<header class="intro-header" >
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                          <a class="tag" href="/tags/#Research Report" title="Research Report">Research Report</a>
+                        
+                          <a class="tag" href="/tags/#spreadsheets" title="spreadsheets">spreadsheets</a>
+                        
+                          <a class="tag" href="/tags/#version control" title="version control">version control</a>
+                        
+                    </div>
+                    <h1>调研报告：表格文档版本管理</h1>
+                    <h2 class="subheading">Research Report: Version Control Of Spreadsheets Products</h2>
+                    <span class="meta">
+                        Posted by Kevin on
+                        2022-07-12
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <blockquote>
+<p>历史记录和版本管理功能，在表格文档功能模块中是一个常见的需求。我在SpreadJS技术顾问的工作中，也曾多次收到过客户一些这样的需求：怎么记录修改的单元格信息？怎样获得并记录用户的操作行为？怎样保护所有单元格不被修改，但要能够记录原始的单元格保护状态等问题。当我与客户进一步沟通时，发现以上问题几乎都是来自于版本管理的需求范畴。</p>
+</blockquote>
+<h2 id="报告结构："><a href="#报告结构：" class="headerlink" title="报告结构："></a>报告结构：</h2><ol start="0">
+<li>演示视频(于2022-07-10提交)</li>
+<li>导言</li>
+<li>在线文档实现</li>
+<li>Office相关实现</li>
+<li>常见需求场景</li>
+<li>总结</li>
+<li>附录</li>
+</ol>
+<h2 id="演示视频"><a href="#演示视频" class="headerlink" title="演示视频"></a>演示视频</h2><p>本节为方案演示视频，基于 2022-07-10 提交 Demo 录制。</p>
+<iframe src="//videos.grapecity.com.cn/SpreadJS/online/wendangguanli.mp4" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"  width="700px" height="400px"> </iframe>
+
+<blockquote>
+<p>Origin: <a target="_blank" rel="noopener" href="https://www.grapecity.com.cn/developer/spreadjs/industry/version">https://www.grapecity.com.cn/developer/spreadjs/industry/version</a></p>
+</blockquote>
+<h2 id="一、导言"><a href="#一、导言" class="headerlink" title="一、导言"></a>一、导言</h2><ol>
+<li><p>研究背景</p>
+<p> 历史记录和版本管理功能，在表格文档功能模块中是一个常见的需求。我在SpreadJS技术顾问的工作中，也曾多次收到过客户一些这样的需求：怎么记录修改的单元格信息？怎样获得并记录用户的操作行为？怎样保护所有单元格不被修改，但要能够记录原始的单元格保护状态等问题。当我与客户进一步沟通时，发现以上问题几乎都是来自于版本管理的需求范畴。</p>
+<p> 作为一个专业表格控件团队，我认为我们有必要详细调研完整的版本管理需求，以及结合实际应用场景下的应用实现。</p>
+</li>
+<li><p>研究目的</p>
+<p> 了解当前市场上主流的表格文档工具版本管理功能的设计，学习主流表格文档产品的实现思路，从满足需求、接受程度高、交互友好、用户易用、实现难度等几个方面进行分析总结，以便提供给客户一个完整、专业的方案，同时指导我们自己产品的未来方向。</p>
+</li>
+</ol>
+<h2 id="二、在线文档的实现"><a href="#二、在线文档的实现" class="headerlink" title="二、在线文档的实现"></a>二、在线文档的实现</h2><p>本次调研选取了多个主流在线文档产品，学习了这些产品的相关实现方式。调研对象包括：Google Docs、金山文档、腾讯文档、石墨文档、飞书、语雀。其中有些比较有影响力的文档产品，如印象笔记（无表格功能）、有道云笔记（当前为Beta版, 无版本管理功能）、Notion（无类Excel的表格文档功能）由于()内原因没有继续深入了解。</p>
+<p>下面罗列了这些文档产品相关功能的截图和注解，本段的最后有总结。</p>
+<ol>
+<li><p>Google Docs</p>
+<p> 在线文档领域，Google出道最早，在2006年前后就推出了GoogleDocs。虽然国内用户很少，但考虑到它从无到有的开创性，被选为本次调研首先选择的对象。</p>
+<p> <img src="001.png" alt="Google Docs版本管理界面"></p>
+<p> 图中标记出绿色背景的单元格，是修改的diff部分。GoogleDocs只做了版本记录，没有记录每一步动作。其中版本信息中包含了文件的来源（导入的xlsx文件）以及原始文件查看功能。<br> 用户可以对某个历史版本进行命名，“仅显示已命名版本”按钮就可以过滤掉自动保存的版本，仅保留用户命名的版本。命名方式如图：</p>
+<p> <img src="002.png"></p>
+<p> “显示更改”的复选框，勾选后会高亮当前选中版本中更改的内容。需要特别指出的是，Google Docs的历史版本查看界面和表格交互界面，用了两种不同的实现机制，如图：</p>
+<p> <img src="003.png" alt="表格操作交互界面"></p>
+<p> <img src="004.png" alt="历史版本查看界面"></p>
+<p> 也就是说，历史版本查看界面是不能修改的，这也是以下大部分在线文档产品的设计和实现思路。</p>
+</li>
+<li><p>石墨文档</p>
+<p> 2015年，石墨文档开启了国内在线协作文档的时代。石墨的上线也刺激了国内一众大厂，腾讯、金山等也都先后推出对应的协同文档产品，来抢占这一市场。石墨文档的表格工具采用了SpreadJS，但在细节上做了非常多独到的设计，市场口碑和知名度都比较高（从各平台检索在线文档都榜上有名）。</p>
+<p> <img src="005.png" alt="石墨文档版本管理界面（右侧边栏）"></p>
+<p> <img src="006.png" alt="石墨文档历史记录列表界面（右侧边栏）"></p>
+<p> 石墨文档的版本管理功能，分为历史和版本两个模块。<br> 其中，操作历史会自动记录用户在表格中做的操作（并非每一步操作都会被记录，而是1分钟内的所有操作会被记录为1条历史记录），甚至包括保存版本操作也会被记录为1个历史。这个过程是自动进行的，不需要用户手动操作。</p>
+<p> <img src="007.png"></p>
+<p> 版本功能是由用户手动操作的，用户需要点击“保存当前版本”按钮时，会把当前的文档保存为一个版本，如果当前版本与上个版本没有任何改变，会自动失败并提示“不能重复创建版本”。</p>
+<p> <img src="008.png"></p>
+<p> 在版本管理 / 历史管理界面时，选中对应的版本/历史时，表单中的diff区域会被标记，此时左侧表单区域处于只读状态。如图：</p>
+<p> <img src="009.png"></p>
+</li>
+<li><p>腾讯文档</p>
+<p> 腾讯文档是目前我最常用的一个在线文档产品，常常用来与客户交流问题列表等信息，主要是因为它与我平时常用的沟通工具，如微信、QQ、企业微信、腾讯会议等工具有非常好的集成，无论我在哪个工具中打开的文档，都可以同步到我的云账号里。如图（左图是小程序，右图是腾讯会议）：</p>
+<p> <img src="010.png"> <img src="011.png"></p>
+<p> 从使用体验上讲，功能完备，界面简约（我没有测试过协同和性能），对于基本的功能需求都可以满足。</p>
+<p> <img src="012.png" alt="腾讯文档历史、版本管理界面"></p>
+<p> 与石墨类似，腾讯文档也有历史和版本两个管理界面。区别是，版本功能不能手动创建，而是在点击导出本地xlsx文件或生成副本的时候，才会创建一条版本信息：</p>
+<p> <img src="013.png"></p>
+<p> 腾讯文档的历史记录保存策略是：无论什么修改操作，每过1分钟，会在历史记录下生成1条子记录，记录方式类似石墨文档。如图：</p>
+<p> <img src="014.png"></p>
+</li>
+<li><p>飞书</p>
+<p> 字节跳动出品。它诞生于字节跳动内部员工的使用经验，提供了大量功能丰富、设计美观的表格模板，涵盖了互联网工作中常见的功能性表格模板，并且支持自定义模板的功能，这个让我眼前一亮。如图：</p>
+<p> <img src="015.png" alt="飞书表格模板库"></p>
+<p> <img src="016.png" alt="飞书历史记录管理界面"></p>
+<p> 飞书没有版本的概念，只有历史记录管理功能。它的历史记录会按照操作类型和时间进行分组记录，如图：</p>
+<p> <img src="017.png"></p>
+<p> 我编辑了一批单元格，然后下拉填充了一批单元格，在飞书的历史记录中，会被记录成两条不同的操作历史。</p>
+</li>
+<li><p>语雀</p>
+<p> 语雀出自阿里巴巴，主打的是在线知识库平台，这也是阿里内部主要使用的文档工具。它具有独特的文档管理能力，不过与本次调研的主题相关性不大，还是重点关注它的表格文档版本管理能力。</p>
+<p> <img src="018.png"></p>
+<p> <img src="019.png"></p>
+<p> <img src="020.png"></p>
+<p> 语雀的版本管理功能与石墨文档逻辑类似，UI上略有不同。历史记录是最直接的保存(Ctrl+S) + Diff标记，不区分时间、行为等因素。</p>
+</li>
+<li><p>金山文档</p>
+<p> 得益于WPS在国内的市场占有率，金山文档实际上的用户基数是比较大的。在桌面端WPS注册并登录状态下，WPS会自动同步文档的内容和历史版本信息到金山文档中。实际试用下来，金山文档的功能、体验都不错，对于熟悉了WPS的用户，可以非常顺滑地切换到在线的金山文档。</p>
+<p> 金山文档支持历史记录、版本管理、实时协同等。</p>
+<p> <img src="021.png" alt="金山文档历史记录菜单"></p>
+<p> 金山文档的历史记录功能在这几个文档产品中是最丰富的，包括了近期改动、今天改动、近3天/7天改动、历史版本、协作记录等几个选项。</p>
+<p> <img src="022.png" alt="金山文档改动记录对话框"></p>
+<p> <img src="023.png" alt="金山文档改动记录回放功能"></p>
+<p> 以上两个内容，是金山文档特色的改动记录回看功能，它不仅标记了修改的内容，而且可以显示修改时序，并按步骤回放修改动作。此功能仅支持单元格数据编辑，不支持浮动元素、批注等。<br> 另外，金山文档的历史记录列表功能，类似于石墨文档，会按时段保存子记录，不区分行为（粘贴、下拉、移动单元格、修改等都在一起），当弹出历史版本侧边栏时，左侧的表格区域可以继续编辑，但历史版本列表不会自动刷新。如图：</p>
+<p> <img src="024.png"></p>
+</li>
+<li><p>总结：</p>
+<p> 通过对以上主流在线文档产品的试用，我对它们的版本管理能力做个简单总结。</p>
+<ul>
+<li><p>历史记录：</p>
+<p>  功能上讲，历史记录就是为了记载文档修改的历史，记录的信息包含修改时间、修改人、修改内容（高亮显示）、预览、回滚等功能（金山的回放比较特殊）。</p>
+<p>  实现上看，一条历史记录生成的策略无非三种：按时间、按行为、保存。其中时间和行为常常一起实现，而多数文档产品有自动保存的功能，对历史记录的生成没有强关联。</p>
+<p>  每一条历史记录都可以预览，实际上除了金山文档，其它文档在进入“历史记录”界面时，整个表格都会进入“预览状态”，在预览状态下，表格中会高亮标记出修改的内容单元格，并且不能在预览状态下修改表格内容。</p>
+<p>  用户可以选择指定的历史记录，执行回滚操作。当执行回滚后，相当于做了一步修改操作，会生成新的历史记录（或版本）。</p>
+</li>
+<li><p>版本管理：</p>
+<p>  以上几个文档产品中，有些并没有单独的版本管理功能界面，只实现了历史记录的功能，例如金山文档和GoogleDocs，可以看作是把版本管理和历史记录实现在一起了。</p>
+<p>  比较有代表性的两个是石墨文档和腾讯文档，从实现上看，它们对“版本管理”的定义和实现策略有所不同。</p>
+<p>  石墨文档可以由用户主动创建新版本，但不是建立“分支”或者可以分别预览、编辑。石墨文档的版本管理，类似于手动生成一条历史记录，可以由用户对当前文档内容保存快照，以便后续的回滚。</p>
+<p>  腾讯文档的版本管理，类似开发中的fork或branch的功能，不能由用户手动创建，而是当用户生成副本、保存模板，或导出成本地Excel文档时才会自动生成。也支持历史记录的预览和回滚的功能。</p>
+</li>
+</ul>
+</li>
+</ol>
+<h2 id="三、Office-相关实现"><a href="#三、Office-相关实现" class="headerlink" title="三、Office 相关实现"></a>三、Office 相关实现</h2><p>对于表格工具，最绕不开的还是Office Excel相关的产品。这里主要调研了SharePoint的版本管理功能，以及Excel的Diff工具：Spreadsheet Compare. </p>
+<ol>
+<li><p>SharePoint</p>
+<p> SharePoint的介绍直接看Wikipedia原文吧，这里不多介绍:</p>
+<p> <img src="025.png"></p>
+<p> 它的在线Excel表格中，设计版本管理的界面有三个，如下：</p>
+<p> <img src="026.png" alt="文件右键菜单上的Version history功能"></p>
+<p> <img src="027.png" alt="选中某项历史记录后，点击view后弹出界面"></p>
+<p> <img src="028.png" alt="文档内历史记录列表"></p>
+<p> 打开文档后，点击左上表格名称，可以弹出右侧边栏的历史记录列表，顶部的Save a Copy 和 Restore 按钮分别可以建立当前历史状态的副本，以及执行回滚到选中记录状态。可见从样式和功能上与上一节的在线文档类似，这里不多介绍。</p>
+</li>
+<li><p>Spreadsheet Compare</p>
+<p> 在版本管理中，一项必备的功能就是比对不同版本间的差别。在以上提到的所有在线文档产品中，这项功能实际上都并不算完整。在Excel中有各种元素，值、样式、公式、格式、条件格式、图表、图片、形状等等，以上在线文档产品在对比Diff时，只是高亮了发生改变的单元格（金山文档除外），这样会产生两个问题，一是用户要完整找到所有变更的元素很麻烦，需要把有数据的区域都找一遍；二是对于图片、图表、形状等浮动元素的改变，无法给与有效提示。</p>
+<p> Office Excel桌面版（Windows 10下测试）实际上有个隐藏的Diff工具，非常强大。据了解它是一个扩展包，仅在Office Excel 2013/2016/2019 的Extension及Office 365中才提供。它具备强大的Diff比对功能，如图：</p>
+<p> <img src="029.png"></p>
+<p> 可视区域分为上、中、下三部分，各区域功能如下：</p>
+<p> &lt;1&gt; 上部菜单栏：</p>
+<p> 选择对比文档、显示Diff详情、显示公式、自适应单元格、切换diff/原始样式、导出对比结果、把对比结果列表复制到剪贴板、选项和帮助。</p>
+<p> &lt;2&gt; 中部文档区域：</p>
+<p> 左右分别是参与对比的两个文档，可以切换sheet页，只对比sheet名称相同的表单内容。</p>
+<p> &lt;3&gt; 下部Diff信息区域：</p>
+<p> 对比Diff的内容包括：输入值、计算值、公式、系统生成公式、系统生成公式错误、结构、命名信息、系统生成命名信息、系统生成命名信息错误、宏、数据连接、单元格格式、单元格保护状态、Sheet/Workbook保护状态。</p>
+<p> 从左到右依次是对比信息列表（可勾选）、Diff列表、Diff统计图表。</p>
+</li>
+<li><p>XLTools</p>
+<p> Spreadsheet Compare仅仅是一个Excel文档的Diff工具，有些第三方的插件，通过把它集成到Excel中，实现了完整的版本管理功能。比如XLTools，它集成了版本提交、修改历史保存、Diff对比等功能，如图：</p>
+<p> <img src="030.png" alt="版本提交：需填写提交信息"></p>
+<p> <img src="031.png" alt="修改历史列表"></p>
+<p> <img src="032.png" alt="对比Diff右键菜单选项"></p>
+<p> <img src="033.png" alt="对比、打开版本、回滚选项"></p>
+<p> <img src="034.png" alt="调用Spreadsheet Compare"></p>
+<p> <img src="035.png" alt="Spreadsheet Compare：Diff详情"></p>
+<p> 从截图可见，它采用了类似SVN这种版本管理工具的思路，每次commit都保存了完整的版本副本，再通过Spreadsheet Compare工具执行版本的Diff比对。</p>
+</li>
+</ol>
+<h2 id="四、常见需求场景"><a href="#四、常见需求场景" class="headerlink" title="四、常见需求场景"></a>四、常见需求场景</h2><p>在二、三部分我罗列了一些当前主流的在线文档、和Office的版本管理功能实现。在真实的项目当中，这个功能的应用是非常广泛的。这里我找到一些应用案例：</p>
+<ol>
+<li><p>金蝶云</p>
+<p> 金蝶云是移动互联网时代的新型ERP，旨在帮助企业打造面向新时代的生态互联与协同平台，围绕生态中的每个角色，提供随手可得的云服务，最终实现敏捷协同，智慧运营的企业运营新境界。</p>
+<p> 整个产品采用SOA架构，完全基于BOS平台组建而成，业务架构上贯穿流程驱动与角色驱动思想，结合中国管理模式与中国管理实践积累，精细化支持企业财务管理、供应链管理、生产管理、供应链协同管理、人力资源管理等核心应用。技术架构上该产品采用平台化构建，支持跨数据库应用，支持本地部署、私有云部署与公有云部署三种部署方式，同时还在公有云上开放中国第一款基于ERP的协同开发云平台。</p>
+<ul>
+<li><p>研发物料管理模块：</p>
+<p>  在金蝶云的【研发物料管理】模块，对于物料属性的变更，平台提供了【历史记录】的功能，如下图所示，这是一个典型的历史记录列表，其中生命周期阶段、版次两个字段记录了与版本相关的行为信息，其它字段是模块相关的业务信息。</p>
+<p>  <img src="036.png"></p>
+<p>  还是【研发物料管理】模块，对物料相关对象变化的历史记录管理，同样引入了【历史记录】的功能，直接看图：</p>
+<p>  <img src="037.png"></p>
+</li>
+<li><p>设计BOM管理模块：</p>
+<p>  BOM管理（Bill of Material 物料管理）涉及对BOM的建立、流转、变更、结算等环节进行维护和控制的过程。金蝶云的BOM管理模块，涉及到大量的表格报表设计、比对、版本、生命周期控制等功能点。如图：</p>
+<p>  <img src="038.png" alt="BOM比对配置"></p>
+<p>  <img src="039.png" alt="BOM比对界面"></p>
+<p>  <img src="040.png" alt="BOM比对界面可操作项"></p>
+<p>  <img src="041.png" alt="历史版本管理列表"></p>
+<p>  <img src="042.png" alt="历史版本管理列表选项"></p>
+</li>
+<li><p>文档管理</p>
+<p>  在金蝶云的平台中，文档管理是PLM系统的主要功能模块之一，管理产品全生命周期内所产生的各种文档，包括研发过程控制文件、产品图纸、体系文件、工艺手册、检验规范、技术资料等。</p>
+<p>  通过对项目过程中的资料收集而建立企业的电子资料库，规范化的标准资料库，方便企业查询使用，加快研发速度，提升研发效率，创造更大的经济价值。</p>
+<p>  其中，【历史记录】的功能可以提供给用户追溯修改历史的能力。历史记录界面如下：</p>
+<p>  <img src="043.png"></p>
+<p>  <img src="044.png"></p>
+<p>  <img src="045.png"></p>
+</li>
+</ul>
+</li>
+<li><p>某合同管理系统</p>
+<p> 在企业合同管理的业务模型中，合同拟定、合同变更等环节都涉及到合同文档的修改。通常针对合同修改的内容、段落、字体、格式、标记等元素，都需要记录变更详情，以便后期追溯。一个完整的合同管理流程如下图所示：</p>
+<p> <img src="046.png"></p>
+<p> 通常合同文档常见的格式有Word 和 Excel两类，而以Word文档为主体的合同文档，通常也会附上一个或多个描述数据/交付物/时间等信息的Excel文档，因此这也是版本管理的常见应用场景之一。下图是某公司的购销合同模板示例：</p>
+<p> <img src="047.png"></p>
+</li>
+</ol>
+<h2 id="五、总结"><a href="#五、总结" class="headerlink" title="五、总结"></a>五、总结</h2><p>以上是本次【表格版本管理】调研报告的主要内容。</p>
+<p>本篇报告首先简述了调研背景、调研目的；其次了解了市场上主流文档产品、以及Office Excel的版本管理的相关实现，这些产品基本上占据了在线/本地表格文档产品的大部分市场份额，因此我把它们的实现方式作为一种较为成熟的参考依据。</p>
+<p>第四部分我尝试展示了一些实际的管理系统中对于版本管理功能的应用。这部分调研难度还是比较大的，我引用了大量的第三方文档和资料，但没有找到相关的实际系统可以直接操作体验。如果大家有更好的案例，希望能提出讨论，分享补充丰富。</p>
+<h2 id="六、附录"><a href="#六、附录" class="headerlink" title="六、附录"></a>六、附录</h2><p>附：各产品横向对比表格</p>
+<p><img src="048.png"></p>
+
+
+                <hr>
+
+                
+
+                <ul class="pager">
+                    
+                        <li class="previous">
+                            <a href="/2022/09/22/su-React-SpringBoot-Quartz-Automatic-Reports/" data-toggle="tooltip" data-placement="top" title="React + SpringBoot + Quartz: 从0实现Excel报表自动化">&larr; Previous Post</a>
+                        </li>
+                    
+                    
+                        <li class="next">
+                            <a href="/2021/06/30/rn-consultative-selling/" data-toggle="tooltip" data-placement="top" title="《顾问式销售》读书笔记">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                
+
+                
+
+            </div>
+    <!-- Side Catalog Container -->
+        
+
+    <!-- Sidebar Container -->
+
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#Research Report" title="Research Report">Research Report</a>
+                        
+                          <a class="tag" href="/tags/#spreadsheets" title="spreadsheets">spreadsheets</a>
+                        
+                          <a class="tag" href="/tags/#version control" title="version control">version control</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+            </div>
+
+        </div>
+    </div>
+</article>
+
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'always',
+          placement: 'right',
+          icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://www.linkedin.com/in/kevin-chenkaihua">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://github.com/Gameckh">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://www.instagram.com/kevin.chenkh">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-instagram fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; KevinChen&#39;s Blog 2023
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+
+<script src="/js/jquery.min.js"></script>
+
+
+<!-- Bootstrap Core JavaScript -->
+
+<script src="/js/bootstrap.min.js"></script>
+
+
+<!-- Custom Theme JavaScript -->
+
+<script src="/js/hux-blog.min.js"></script>
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("https://gameckh.github.io/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+
+
+<!-- Baidu Tongji -->
+
+
+<!-- Side Catalog -->
+
+
+<div id="totop" style="position:fixed;bottom:50px;right:30px;">
+  <a title="返回顶部"><img style="cursor: pointer;" src="/img/scrollup.png"/></a>
+</div>
+
+<script src="/js/totop.js"></script>
+
+
+
+<!-- Image to hack wechat -->
+<img src="https://gameckh.github.io/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

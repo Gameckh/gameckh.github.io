@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword"  content="">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+          高性能 React Data Grids 解决方案 - KevinChen&#39;s Blog
+        
+    </title>
+
+    <link rel="canonical" href="https://gameckh.github.io/2020/08/22/wijmo-High-Performance-React-Data-Grids-Solutions/">
+
+    <!-- Bootstrap Core CSS -->
+    
+<link rel="stylesheet" href="/css/bootstrap.min.css">
+
+
+    <!-- Custom CSS -->
+    
+<link rel="stylesheet" href="/css/hux-blog.min.css">
+
+
+    <!-- Pygments Highlight CSS -->
+    
+<link rel="stylesheet" href="/css/highlight.css">
+
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">KevinChen&#39;s Blog</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About My Blog</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archives/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    
+<!-- Image to hack wechat -->
+<!-- <img src="https://gameckh.github.io/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="{{ site.baseurl }}/{% if page.header-img %}{{ page.header-img }}{% else %}{{ site.header-img }}{% endif %}" width="0" height="0"> -->
+
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        background-image: url('post-bg.jpg')
+    }
+</style>
+<header class="intro-header" >
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                          <a class="tag" href="/tags/#React" title="React">React</a>
+                        
+                          <a class="tag" href="/tags/#Grids" title="Grids">Grids</a>
+                        
+                    </div>
+                    <h1>高性能 React Data Grids 解决方案</h1>
+                    <h2 class="subheading">High-Performance React Data Grids Solution</h2>
+                    <span class="meta">
+                        Posted by Kevin on
+                        2020-08-22
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <blockquote>
+<p>大多数前端开发人员都熟悉这种情况：用于数据驱动的应用程序的新项目开始。每个人都相信设计必须尽可能简单明了。它的核心是一个简单的表-几列多行。但是，即使在最低限度可行的应用程序发布之前，也很清楚简单的表是不够的。涉众想要分页和过滤。设计师要求个性化和灵活性。这是我们（开发人员）以现有数据网格形式寻求帮助的时刻。</p>
+</blockquote>
+<blockquote>
+<p>Origin: <a target="_blank" rel="noopener" href="https://gcdn.grapecity.com.cn/showtopic-80129-1-1.html">https://gcdn.grapecity.com.cn/showtopic-80129-1-1.html</a></p>
+</blockquote>
+<p><img src="001.jpg"></p>
+<p>在本文中，我们将学习如何将数据网格集成到React应用程序中，并查看一些将数据集成到网格中的最佳实践，从导入文件到与API和数据库连接。</p>
+<p><strong>数据网格功能数据网格与表</strong></p>
+<p>在最基本的形式中，数据网格可以看作是一个表-数据以行和列表示。区别已经开始于基本功能，例如滚动。尽管表格仅提供粘性标题（通常会显示列定义），但其功能却要复杂得多。相同的模式继续排序（具有优先级的多列）和数据选择。后者现在基于单元而不是基于行。</p>
+<p>我们将在许多数据网格中找到的另一个功能是数据导出功能。在最简单的情况下，这等效于剪贴板副本。但是，今天，导出到CSV文件甚至打印的报告也没有什么不同。</p>
+<p>通常，数据网格支持与标准电子表格应用程序（例如Excel）的互操作性，从而可以提高生产率。与实时更新和后端支持的协作技术捆绑在一起，这使数据网格成为真正的数据处理野兽。Microsoft在几乎所有其他在线数据编辑工具（例如Power BI）中使用Excel 365引擎并非偶然。</p>
+<p>真正将数据网格与表格区分开的功能包括自定义单元格渲染和格式功能。在这里，我们可以想到特定单元格中显示的图表或其他丰富的可视化效果。另一个示例是快速的视觉提示，例如迷你图。</p>
+<p>最后但并非最不重要的一点是，人们对可访问性功能有强烈的需求。数据网格提供了对单元格突出显示，触摸支持，覆盖图标和键盘导航的支持，这些功能接近或超过了本地电子表格应用程序的功能。</p>
+<p><img src="002.jpg"></p>
+<p><strong>在React中滚动自己的数据网格</strong></p>
+<p>React生态系统包括许多可行的数据网格组件。这些使您仅需几行代码即可访问所有预打包的功能。在深入研究可用解决方案之前，让我们看看如何从头开始实现适当的数据网格。</p>
+<p>由于每个数据网格的核心都是表格，因此我们将从此开始。在React中设计表有两种基本方法：</p>
+<ul>
+<li><p>遵循典型的HTML抽象层并使用子代创建组件，例如TableContainer：TableHeader，TableFooter，TableRow和TableCell。</p>
+</li>
+<li><p>使用渲染道具和其他专用道具的单个Table组件用于调整目标渲染。</p>
+</li>
+</ul>
+<p>尽管第一种选择是一种具有简单但始终如一的样式表的特殊方法，但是第二种选择（具有渲染道具的Table组件）可以通过将许多表示逻辑转换为抽象层来实现更多功能。因此，这是现有解决方案中通常采用的路径。</p>
+<p>让我们看一下第一种方法的简单实现，没有错误处理和其他令人兴奋的功能：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> * <span class="keyword">as</span> React <span class="keyword">from</span> <span class="string">&quot;react&quot;</span>;</span><br><span class="line"><span class="keyword">const</span> TableContainer = <span class="function">(<span class="params">&#123; striped, children &#125;</span>) =&gt;</span> (</span><br><span class="line">  <span class="xml"><span class="tag">&lt;<span class="name">table</span> <span class="attr">className</span>=<span class="string">&#123;striped</span> ? &quot;<span class="attr">table-striped</span>&quot; <span class="attr">:</span> &quot;&quot;&#125;&gt;</span>&#123;children&#125;<span class="tag">&lt;/<span class="name">table</span>&gt;</span></span></span><br><span class="line">);</span><br><span class="line"><span class="keyword">const</span> TableHeader = <span class="function">(<span class="params">&#123; children &#125;</span>) =&gt;</span> <span class="xml"><span class="tag">&lt;<span class="name">thead</span>&gt;</span>&#123;children&#125;<span class="tag">&lt;/<span class="name">thead</span>&gt;</span></span>;</span><br><span class="line"><span class="keyword">const</span> TableBody = <span class="function">(<span class="params">&#123; children &#125;</span>) =&gt;</span> <span class="xml"><span class="tag">&lt;<span class="name">tbody</span>&gt;</span>&#123;children&#125;<span class="tag">&lt;/<span class="name">tbody</span>&gt;</span></span>;</span><br><span class="line"><span class="keyword">const</span> TableRow = <span class="function">(<span class="params">&#123; children &#125;</span>) =&gt;</span> <span class="xml"><span class="tag">&lt;<span class="name">tr</span>&gt;</span>&#123;children&#125;<span class="tag">&lt;/<span class="name">tr</span>&gt;</span></span>;</span><br><span class="line"><span class="keyword">const</span> TableCell = <span class="function">(<span class="params">&#123; children &#125;</span>) =&gt;</span> <span class="xml"><span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;children&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></span>;</span><br><span class="line"><span class="keyword">const</span> MyTable = <span class="function">() =&gt;</span> (</span><br><span class="line">  <span class="xml"><span class="tag">&lt;<span class="name">TableContainer</span> <span class="attr">striped</span>&gt;</span></span></span><br><span class="line"><span class="xml">    <span class="tag">&lt;<span class="name">TableHeader</span>&gt;</span></span></span><br><span class="line"><span class="xml">      <span class="tag">&lt;<span class="name">TableRow</span>&gt;</span></span></span><br><span class="line"><span class="xml">        <span class="tag">&lt;<span class="name">TableCell</span>&gt;</span>ID<span class="tag">&lt;/<span class="name">TableCell</span>&gt;</span></span></span><br><span class="line"><span class="xml">        <span class="tag">&lt;<span class="name">TableCell</span>&gt;</span>Name<span class="tag">&lt;/<span class="name">TableCell</span>&gt;</span></span></span><br><span class="line"><span class="xml">        <span class="tag">&lt;<span class="name">TableCell</span>&gt;</span>Age<span class="tag">&lt;/<span class="name">TableCell</span>&gt;</span></span></span><br><span class="line"><span class="xml">      <span class="tag">&lt;/<span class="name">TableRow</span>&gt;</span></span></span><br><span class="line"><span class="xml">    <span class="tag">&lt;/<span class="name">TableHeader</span>&gt;</span></span></span><br><span class="line"><span class="xml">    <span class="tag">&lt;<span class="name">TableBody</span>&gt;</span></span></span><br><span class="line"><span class="xml">      <span class="tag">&lt;<span class="name">TableRow</span>&gt;</span></span></span><br><span class="line"><span class="xml">        <span class="tag">&lt;<span class="name">TableCell</span>&gt;</span>1<span class="tag">&lt;/<span class="name">TableCell</span>&gt;</span></span></span><br><span class="line"><span class="xml">        <span class="tag">&lt;<span class="name">TableCell</span>&gt;</span>Foo<span class="tag">&lt;/<span class="name">TableCell</span>&gt;</span></span></span><br><span class="line"><span class="xml">        <span class="tag">&lt;<span class="name">TableCell</span>&gt;</span>21<span class="tag">&lt;/<span class="name">TableCell</span>&gt;</span></span></span><br><span class="line"><span class="xml">      <span class="tag">&lt;/<span class="name">TableRow</span>&gt;</span></span></span><br><span class="line"><span class="xml">      <span class="tag">&lt;<span class="name">TableRow</span>&gt;</span></span></span><br><span class="line"><span class="xml">        <span class="tag">&lt;<span class="name">TableCell</span>&gt;</span>2<span class="tag">&lt;/<span class="name">TableCell</span>&gt;</span></span></span><br><span class="line"><span class="xml">        <span class="tag">&lt;<span class="name">TableCell</span>&gt;</span>Bar<span class="tag">&lt;/<span class="name">TableCell</span>&gt;</span></span></span><br><span class="line"><span class="xml">        <span class="tag">&lt;<span class="name">TableCell</span>&gt;</span>29<span class="tag">&lt;/<span class="name">TableCell</span>&gt;</span></span></span><br><span class="line"><span class="xml">      <span class="tag">&lt;/<span class="name">TableRow</span>&gt;</span></span></span><br><span class="line"><span class="xml">    <span class="tag">&lt;/<span class="name">TableBody</span>&gt;</span></span></span><br><span class="line"><span class="xml">  <span class="tag">&lt;/<span class="name">TableContainer</span>&gt;</span></span></span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>这个想法是，单个组件（例如TableContainer）可以通过其道具公开所有不同的选项。这样，MyTable组件可以直接使用这些道具，而不是通过隐秘的类名或奇怪的属性来使用。</p>
+<p>现在，按照第二种方法，前面的示例看起来有些不同：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> * <span class="keyword">as</span> React <span class="keyword">from</span> <span class="string">&quot;react&quot;</span>;</span><br><span class="line"><span class="keyword">const</span> Table = <span class="function">(<span class="params">&#123; striped, columns, data, keyProp &#125;</span>) =&gt;</span> (</span><br><span class="line">  <span class="xml"><span class="tag">&lt;<span class="name">table</span> <span class="attr">className</span>=<span class="string">&#123;striped</span> ? &quot;<span class="attr">table-striped</span>&quot; <span class="attr">:</span> &quot;&quot;&#125;&gt;</span></span></span><br><span class="line"><span class="xml">    <span class="tag">&lt;<span class="name">thead</span>&gt;</span></span></span><br><span class="line"><span class="xml">      <span class="tag">&lt;<span class="name">tr</span>&gt;</span></span></span><br><span class="line"><span class="xml">        &#123;columns.map((column) =&gt; (</span></span><br><span class="line"><span class="xml">          <span class="tag">&lt;<span class="name">th</span> <span class="attr">key</span>=<span class="string">&#123;column.prop&#125;</span>&gt;</span>&#123;column.label&#125;<span class="tag">&lt;/<span class="name">th</span>&gt;</span></span></span><br><span class="line"><span class="xml">        ))&#125;</span></span><br><span class="line"><span class="xml">      <span class="tag">&lt;/<span class="name">tr</span>&gt;</span></span></span><br><span class="line"><span class="xml">    <span class="tag">&lt;/<span class="name">thead</span>&gt;</span></span></span><br><span class="line"><span class="xml">    <span class="tag">&lt;<span class="name">tbody</span>&gt;</span></span></span><br><span class="line"><span class="xml">      &#123;data.map((row) =&gt; (</span></span><br><span class="line"><span class="xml">        <span class="tag">&lt;<span class="name">tr</span> <span class="attr">key</span>=<span class="string">&#123;row[keyProp]&#125;</span>&gt;</span></span></span><br><span class="line"><span class="xml">          &#123;columns.map((column) =&gt; (</span></span><br><span class="line"><span class="xml">            <span class="tag">&lt;<span class="name">td</span> <span class="attr">key</span>=<span class="string">&#123;column.prop&#125;</span>&gt;</span>&#123;row[column.prop]&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></span></span><br><span class="line"><span class="xml">          ))&#125;</span></span><br><span class="line"><span class="xml">        <span class="tag">&lt;/<span class="name">tr</span>&gt;</span></span></span><br><span class="line"><span class="xml">      ))&#125;</span></span><br><span class="line"><span class="xml">    <span class="tag">&lt;/<span class="name">tbody</span>&gt;</span></span></span><br><span class="line"><span class="xml">  <span class="tag">&lt;/<span class="name">table</span>&gt;</span></span></span><br><span class="line">);</span><br><span class="line"><span class="keyword">const</span> MyTable = <span class="function">() =&gt;</span> (</span><br><span class="line">  <span class="xml"><span class="tag">&lt;<span class="name">Table</span></span></span></span><br><span class="line"><span class="tag"><span class="xml">    <span class="attr">striped</span></span></span></span><br><span class="line"><span class="tag"><span class="xml">    <span class="attr">keyProp</span>=<span class="string">&quot;id&quot;</span></span></span></span><br><span class="line"><span class="tag"><span class="xml">    <span class="attr">columns</span>=<span class="string">&#123;[</span></span></span></span><br><span class="line"><span class="tag"><span class="xml">      &#123; <span class="attr">label:</span> &quot;<span class="attr">ID</span>&quot;, <span class="attr">prop:</span> &quot;<span class="attr">id</span>&quot; &#125;,</span></span></span><br><span class="line"><span class="tag"><span class="xml">      &#123; <span class="attr">label:</span> &quot;<span class="attr">Name</span>&quot;, <span class="attr">prop:</span> &quot;<span class="attr">name</span>&quot; &#125;,</span></span></span><br><span class="line"><span class="tag"><span class="xml">      &#123; <span class="attr">label:</span> &quot;<span class="attr">Age</span>&quot;, <span class="attr">prop:</span> &quot;<span class="attr">age</span>&quot; &#125;,</span></span></span><br><span class="line"><span class="tag"><span class="xml">    ]&#125;</span></span></span><br><span class="line"><span class="tag"><span class="xml">    <span class="attr">data</span>=<span class="string">&#123;[</span></span></span></span><br><span class="line"><span class="tag"><span class="xml">      &#123; <span class="attr">id:</span> <span class="attr">1</span>, <span class="attr">name:</span> &quot;<span class="attr">Foo</span>&quot;, <span class="attr">city:</span> &quot;&quot;, <span class="attr">age:</span> <span class="attr">21</span> &#125;,</span></span></span><br><span class="line"><span class="tag"><span class="xml">      &#123; <span class="attr">id:</span> <span class="attr">2</span>, <span class="attr">name:</span> &quot;<span class="attr">Bar</span>&quot;, <span class="attr">city:</span> &quot;&quot;, <span class="attr">age:</span> <span class="attr">29</span> &#125;,</span></span></span><br><span class="line"><span class="tag"><span class="xml">    ]&#125;</span></span></span><br><span class="line"><span class="tag"><span class="xml">  /&gt;</span></span></span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>如您所见，Table组件中的逻辑更加抽象。渲染成本也更高。但是，这可以很好地控制和优化，例如，通过使用诸如useMemo的技术来缓存部件。</p>
+<p>这种方法的最大优势无疑是数据驱动方面。您可以只插入一些数据并取回渲染的表，而不必完全自己构造表。</p>
+<p>您可以利用相同的原理从该版本升级到完整的数据网格组件。但是，今天，没有什么理由可以滚动自己的数据网格。</p>
+<p><strong>数据网格控件处理艰苦的工作</strong></p>
+<p>最好的选择是合并一个数据网格控件，而不是重新设计轮子来以编程的方式创建表并仍然受HTML表的限制，而不是重新设计轮子。有一些出色的开源选择，包括：</p>
+<ul>
+<li>虚拟化反应</li>
+<li>反应数据网格</li>
+<li>反应表</li>
+</ul>
+<p>还有许多其他方面，每种通常都可以满足其创建者的特定需求-就像开源项目一样。</p>
+<p>尽管开放源代码选项很吸引人，但Wijmo等商业产品为React数据网格组件提供了明显的优势。GrapeCity的Wijmo随附的FlexGrid是React最好的即插即用数据网格。</p>
+<p>优势之一是数据网格默认包含的广泛功能集。另一个是支持和持续发展的承诺。</p>
+<p><strong>运行中的基本React数据网格控件</strong></p>
+<p>让我们先看一下表示某些数据（包括视觉提示）的简单数据网格可视化。我将使用一些任意的日期和计数数据来表示我们都熟悉的数据集的类型，如下表所示：</p>
+<p><img src="003.jpg"></p>
+<p>使用React Data Grid，页面代码看起来像这样：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> React <span class="keyword">from</span> <span class="string">&quot;react&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> ReactDataGrid <span class="keyword">from</span> <span class="string">&quot;react-data-grid&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; Sparklines, SparklinesLine, SparklinesSpots &#125; <span class="keyword">from</span> <span class="string">&quot;react-sparklines&quot;</span>;</span><br><span class="line"><span class="keyword">const</span> Sparkline = <span class="function">(<span class="params">&#123; row &#125;</span>) =&gt;</span> (</span><br><span class="line">  <span class="xml"><span class="tag">&lt;<span class="name">Sparklines</span></span></span></span><br><span class="line"><span class="tag"><span class="xml">    <span class="attr">data</span>=<span class="string">&#123;[row.jan,</span> <span class="attr">row.feb</span>, <span class="attr">row.mar</span>, <span class="attr">row.apr</span>, <span class="attr">row.may</span>, <span class="attr">row.jun</span>]&#125;</span></span></span><br><span class="line"><span class="tag"><span class="xml">    <span class="attr">margin</span>=<span class="string">&#123;6&#125;</span></span></span></span><br><span class="line"><span class="tag"><span class="xml">    <span class="attr">height</span>=<span class="string">&#123;40&#125;</span></span></span></span><br><span class="line"><span class="tag"><span class="xml">    <span class="attr">width</span>=<span class="string">&#123;200&#125;</span></span></span></span><br><span class="line"><span class="tag"><span class="xml">  &gt;</span></span></span><br><span class="line"><span class="xml">    <span class="tag">&lt;<span class="name">SparklinesLine</span></span></span></span><br><span class="line"><span class="tag"><span class="xml">      <span class="attr">style</span>=<span class="string">&#123;&#123;</span> <span class="attr">strokeWidth:</span> <span class="attr">3</span>, <span class="attr">stroke:</span> &quot;#<span class="attr">336aff</span>&quot;, <span class="attr">fill:</span> &quot;<span class="attr">none</span>&quot; &#125;&#125;</span></span></span><br><span class="line"><span class="tag"><span class="xml">    /&gt;</span></span></span><br><span class="line"><span class="xml">    <span class="tag">&lt;<span class="name">SparklinesSpots</span></span></span></span><br><span class="line"><span class="tag"><span class="xml">      <span class="attr">size</span>=<span class="string">&#123;4&#125;</span></span></span></span><br><span class="line"><span class="tag"><span class="xml">      <span class="attr">style</span>=<span class="string">&#123;&#123;</span> <span class="attr">stroke:</span> &quot;#<span class="attr">336aff</span>&quot;, <span class="attr">strokeWidth:</span> <span class="attr">3</span>, <span class="attr">fill:</span> &quot;<span class="attr">white</span>&quot; &#125;&#125;</span></span></span><br><span class="line"><span class="tag"><span class="xml">    /&gt;</span></span></span><br><span class="line"><span class="xml">  <span class="tag">&lt;/<span class="name">Sparklines</span>&gt;</span></span></span><br><span class="line">);</span><br><span class="line"><span class="keyword">const</span> columns = [</span><br><span class="line">  &#123; <span class="attr">key</span>: <span class="string">&quot;year&quot;</span>, <span class="attr">name</span>: <span class="string">&quot;Year&quot;</span> &#125;,</span><br><span class="line">  &#123; <span class="attr">key</span>: <span class="string">&quot;jan&quot;</span>, <span class="attr">name</span>: <span class="string">&quot;January&quot;</span> &#125;,</span><br><span class="line">  &#123; <span class="attr">key</span>: <span class="string">&quot;feb&quot;</span>, <span class="attr">name</span>: <span class="string">&quot;February&quot;</span> &#125;,</span><br><span class="line">  &#123; <span class="attr">key</span>: <span class="string">&quot;mar&quot;</span>, <span class="attr">name</span>: <span class="string">&quot;March&quot;</span> &#125;,</span><br><span class="line">  &#123; <span class="attr">key</span>: <span class="string">&quot;apr&quot;</span>, <span class="attr">name</span>: <span class="string">&quot;April&quot;</span> &#125;,</span><br><span class="line">  &#123; <span class="attr">key</span>: <span class="string">&quot;may&quot;</span>, <span class="attr">name</span>: <span class="string">&quot;May&quot;</span> &#125;,</span><br><span class="line">  &#123; <span class="attr">key</span>: <span class="string">&quot;jun&quot;</span>, <span class="attr">name</span>: <span class="string">&quot;June&quot;</span> &#125;,</span><br><span class="line">  &#123; <span class="attr">name</span>: <span class="string">&quot;Info&quot;</span>, <span class="attr">formatter</span>: Sparkline &#125;,</span><br><span class="line">];</span><br><span class="line"><span class="keyword">const</span> rows = [</span><br><span class="line">  &#123; <span class="attr">year</span>: <span class="number">2016</span>, <span class="attr">jan</span>: <span class="number">20</span>, <span class="attr">feb</span>: <span class="number">108</span>, <span class="attr">mar</span>: <span class="number">45</span>, <span class="attr">apr</span>: <span class="number">10</span>, <span class="attr">may</span>: <span class="number">105</span>, <span class="attr">jun</span>: <span class="number">48</span> &#125;,</span><br><span class="line">  &#123; <span class="attr">year</span>: <span class="number">2017</span>, <span class="attr">jan</span>: <span class="number">48</span>, <span class="attr">feb</span>: <span class="number">10</span>, <span class="attr">mar</span>: <span class="number">0</span>, <span class="attr">apr</span>: <span class="number">0</span>, <span class="attr">may</span>: <span class="number">78</span>, <span class="attr">jun</span>: <span class="number">74</span> &#125;,</span><br><span class="line">  &#123; <span class="attr">year</span>: <span class="number">2018</span>, <span class="attr">jan</span>: <span class="number">12</span>, <span class="attr">feb</span>: <span class="number">102</span>, <span class="attr">mar</span>: <span class="number">10</span>, <span class="attr">apr</span>: <span class="number">0</span>, <span class="attr">may</span>: <span class="number">0</span>, <span class="attr">jun</span>: <span class="number">100</span> &#125;,</span><br><span class="line">  &#123; <span class="attr">year</span>: <span class="number">2019</span>, <span class="attr">jan</span>: <span class="number">1</span>, <span class="attr">feb</span>: <span class="number">20</span>, <span class="attr">mar</span>: <span class="number">3</span>, <span class="attr">apr</span>: <span class="number">40</span>, <span class="attr">may</span>: <span class="number">5</span>, <span class="attr">jun</span>: <span class="number">60</span> &#125;,</span><br><span class="line">];</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="function"><span class="keyword">function</span> <span class="title">ReactDataGridPage</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> (</span><br><span class="line">    <span class="xml"><span class="tag">&lt;<span class="name">ReactDataGrid</span></span></span></span><br><span class="line"><span class="tag"><span class="xml">      <span class="attr">columns</span>=<span class="string">&#123;columns&#125;</span></span></span></span><br><span class="line"><span class="tag"><span class="xml">      <span class="attr">rowGetter</span>=<span class="string">&#123;(i)</span> =&gt;</span> rows[i]&#125;</span></span><br><span class="line"><span class="xml">      rowsCount=&#123;rows.length&#125;</span></span><br><span class="line"><span class="xml">    /&gt;</span></span><br><span class="line">  );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>为了显示图表和其他图形，我需要依赖第三方库。在上述情况下，我安装了react-sparklines以演示迷你图。列是使用对象定义的。对于迷你图，我回退到没有后备字段的自定义格式化程序。<br>结果显示如下：</p>
+<p><img src="004.jpg"></p>
+<p><strong>创建一个高级React数据网格</strong></p>
+<p>现在，让我们使用FlexGrid显示相同的数据。对于相同数量的代码，您将获得更好的外观和更灵活的数据显示。</p>
+<p>页面代码现在看起来像这样：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line">&lt;font color=<span class="string">&quot;#000000&quot;</span>&gt;<span class="keyword">import</span> <span class="string">&quot;@grapecity/wijmo.styles/wijmo.css&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> React <span class="keyword">from</span> <span class="string">&quot;react&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; CollectionView &#125; <span class="keyword">from</span> <span class="string">&quot;@grapecity/wijmo&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; FlexGrid, FlexGridColumn &#125; <span class="keyword">from</span> <span class="string">&quot;@grapecity/wijmo.react.grid&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; CellMaker, SparklineMarkers &#125; <span class="keyword">from</span> <span class="string">&quot;@grapecity/wijmo.grid.cellmaker&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; SortDescription &#125; <span class="keyword">from</span> <span class="string">&quot;@grapecity/wijmo&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> data = [</span><br><span class="line">  &#123; <span class="attr">year</span>: <span class="number">2016</span>, <span class="attr">jan</span>: <span class="number">20</span>, <span class="attr">feb</span>: <span class="number">108</span>, <span class="attr">mar</span>: <span class="number">45</span>, <span class="attr">apr</span>: <span class="number">10</span>, <span class="attr">may</span>: <span class="number">105</span>, <span class="attr">jun</span>: <span class="number">48</span> &#125;,</span><br><span class="line">  &#123; <span class="attr">year</span>: <span class="number">2017</span>, <span class="attr">jan</span>: <span class="number">48</span>, <span class="attr">feb</span>: <span class="number">10</span>, <span class="attr">mar</span>: <span class="number">0</span>, <span class="attr">apr</span>: <span class="number">0</span>, <span class="attr">may</span>: <span class="number">78</span>, <span class="attr">jun</span>: <span class="number">74</span> &#125;,</span><br><span class="line">  &#123; <span class="attr">year</span>: <span class="number">2018</span>, <span class="attr">jan</span>: <span class="number">12</span>, <span class="attr">feb</span>: <span class="number">102</span>, <span class="attr">mar</span>: <span class="number">10</span>, <span class="attr">apr</span>: <span class="number">0</span>, <span class="attr">may</span>: <span class="number">0</span>, <span class="attr">jun</span>: <span class="number">100</span> &#125;,</span><br><span class="line">  &#123; <span class="attr">year</span>: <span class="number">2019</span>, <span class="attr">jan</span>: <span class="number">1</span>, <span class="attr">feb</span>: <span class="number">20</span>, <span class="attr">mar</span>: <span class="number">3</span>, <span class="attr">apr</span>: <span class="number">40</span>, <span class="attr">may</span>: <span class="number">5</span>, <span class="attr">jun</span>: <span class="number">60</span> &#125;,</span><br><span class="line">];</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="function"><span class="keyword">function</span> <span class="title">WijmoPage</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> [view] = React.useState(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> view = <span class="keyword">new</span> CollectionView(</span><br><span class="line">      data.map(<span class="function">(<span class="params">item</span>) =&gt;</span> (&#123;</span><br><span class="line">        ...item,</span><br><span class="line">        <span class="attr">info</span>: [item.jan, item.feb, item.mar, item.apr, item.may, item.jun],</span><br><span class="line">      &#125;))</span><br><span class="line">    );</span><br><span class="line">    <span class="keyword">return</span> view;</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> [infoCellTemplate] = React.useState(<span class="function">() =&gt;</span></span><br><span class="line">    CellMaker.makeSparkline(&#123;</span><br><span class="line">      <span class="attr">markers</span>: SparklineMarkers.High | SparklineMarkers.Low,</span><br><span class="line">      <span class="attr">maxPoints</span>: <span class="number">25</span>,</span><br><span class="line">      <span class="attr">label</span>: <span class="string">&quot;Info&quot;</span>,</span><br><span class="line">    &#125;)</span><br><span class="line">  );</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> (</span><br><span class="line">    <span class="xml"><span class="tag">&lt;<span class="name">FlexGrid</span> <span class="attr">itemsSource</span>=<span class="string">&#123;view&#125;</span>&gt;</span></span></span><br><span class="line"><span class="xml">      <span class="tag">&lt;<span class="name">FlexGridColumn</span> <span class="attr">header</span>=<span class="string">&quot;Year&quot;</span> <span class="attr">binding</span>=<span class="string">&quot;year&quot;</span> <span class="attr">width</span>=<span class="string">&quot;*&quot;</span> /&gt;</span></span></span><br><span class="line"><span class="xml">      <span class="tag">&lt;<span class="name">FlexGridColumn</span> <span class="attr">header</span>=<span class="string">&quot;January&quot;</span> <span class="attr">binding</span>=<span class="string">&quot;jan&quot;</span> <span class="attr">width</span>=<span class="string">&quot;*&quot;</span> /&gt;</span></span></span><br><span class="line"><span class="xml">      <span class="tag">&lt;<span class="name">FlexGridColumn</span> <span class="attr">header</span>=<span class="string">&quot;February&quot;</span> <span class="attr">binding</span>=<span class="string">&quot;feb&quot;</span> <span class="attr">width</span>=<span class="string">&quot;*&quot;</span> /&gt;</span></span></span><br><span class="line"><span class="xml">      <span class="tag">&lt;<span class="name">FlexGridColumn</span> <span class="attr">header</span>=<span class="string">&quot;March&quot;</span> <span class="attr">binding</span>=<span class="string">&quot;mar&quot;</span> <span class="attr">width</span>=<span class="string">&quot;*&quot;</span> /&gt;</span></span></span><br><span class="line"><span class="xml">      <span class="tag">&lt;<span class="name">FlexGridColumn</span> <span class="attr">header</span>=<span class="string">&quot;April&quot;</span> <span class="attr">binding</span>=<span class="string">&quot;apr&quot;</span> <span class="attr">width</span>=<span class="string">&quot;*&quot;</span> /&gt;</span></span></span><br><span class="line"><span class="xml">      <span class="tag">&lt;<span class="name">FlexGridColumn</span> <span class="attr">header</span>=<span class="string">&quot;May&quot;</span> <span class="attr">binding</span>=<span class="string">&quot;may&quot;</span> <span class="attr">width</span>=<span class="string">&quot;*&quot;</span> /&gt;</span></span></span><br><span class="line"><span class="xml">      <span class="tag">&lt;<span class="name">FlexGridColumn</span> <span class="attr">header</span>=<span class="string">&quot;June&quot;</span> <span class="attr">binding</span>=<span class="string">&quot;jun&quot;</span> <span class="attr">width</span>=<span class="string">&quot;*&quot;</span> /&gt;</span></span></span><br><span class="line"><span class="xml">      <span class="tag">&lt;<span class="name">FlexGridColumn</span></span></span></span><br><span class="line"><span class="tag"><span class="xml">        <span class="attr">header</span>=<span class="string">&quot;Info&quot;</span></span></span></span><br><span class="line"><span class="tag"><span class="xml">        <span class="attr">binding</span>=<span class="string">&quot;info&quot;</span></span></span></span><br><span class="line"><span class="tag"><span class="xml">        <span class="attr">align</span>=<span class="string">&quot;center&quot;</span></span></span></span><br><span class="line"><span class="tag"><span class="xml">        <span class="attr">width</span>=<span class="string">&#123;180&#125;</span></span></span></span><br><span class="line"><span class="tag"><span class="xml">        <span class="attr">allowSorting</span>=<span class="string">&#123;false&#125;</span></span></span></span><br><span class="line"><span class="tag"><span class="xml">        <span class="attr">cellTemplate</span>=<span class="string">&#123;infoCellTemplate&#125;</span></span></span></span><br><span class="line"><span class="tag"><span class="xml">      /&gt;</span></span></span><br><span class="line"><span class="xml">    <span class="tag">&lt;/<span class="name">FlexGrid</span>&gt;</span></span></span><br><span class="line">  );</span><br><span class="line">&#125;</span><br><span class="line">&lt;/font&gt;</span><br></pre></td></tr></table></figure>
+
+<p>最值得注意的是，Wijmo数据网格在React中以声明方式定义列。对于迷你图单元格，使用CollectionView。使用useState，我可以缓存数据并使它们在重新渲染之间保持活动状态-无需昂贵的计算。</p>
+<p>在这里，默认结果的外观类似于真实的电子表格应用程序：</p>
+<p><img src="005.jpg"></p>
+<p>由于数据网格是应用程序中最大的组件，因此最好将其延迟加载。如果仅在单个页面上使用数据网格，则可以懒加载该特定页面并避免其他复杂性：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;font color=<span class="string">&quot;#000000&quot;</span>&gt;<span class="keyword">import</span> * <span class="keyword">as</span> React <span class="keyword">from</span> <span class="string">&quot;react&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; Switch, Route &#125; <span class="keyword">from</span> <span class="string">&quot;react-router-dom&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> PageWithDatagrid = React.lazy(<span class="function">() =&gt;</span> <span class="keyword">import</span>(<span class="string">&quot;./pages/DatagridPage&quot;</span>));</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> Routes = <span class="function">() =&gt;</span> (</span><br><span class="line">  <span class="xml"><span class="tag">&lt;<span class="name">Switch</span>&gt;</span></span></span><br><span class="line"><span class="xml">    &#123;/* ... */&#125;</span></span><br><span class="line"><span class="xml">    <span class="tag">&lt;<span class="name">Route</span> <span class="attr">path</span>=<span class="string">&quot;/datagrid&quot;</span> <span class="attr">component</span>=<span class="string">&#123;PageWithDatagrid&#125;</span> /&gt;</span></span></span><br><span class="line"><span class="xml">  <span class="tag">&lt;/<span class="name">Switch</span>&gt;</span></span></span><br><span class="line">);&lt;/font&gt;</span><br></pre></td></tr></table></figure>
+
+<p>唯一的要求是延迟加载的模块具有正确的默认导出：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;font color=<span class="string">&quot;#000000&quot;</span>&gt;<span class="keyword">export</span> <span class="keyword">default</span> <span class="function"><span class="keyword">function</span> <span class="title">PageWithDatagrid</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="comment">/* ... */</span>;</span><br><span class="line">&#125;&lt;/font&gt;</span><br></pre></td></tr></table></figure>
+
+<p>所有唯一的依存关系（例如，数据网格组件）都应包含在边束中。此捆绑包将对启动性能产生重大影响。</p>
+<p><strong>加载数据的最佳做法</strong></p>
+<p>在这些示例中，我仅加载了一些硬编码数据。在实际的应用程序中，您很可能会从文件，数据库或API等外部来源获取动态数据。</p>
+<p>虽然加载数据通常被认为是一个主要的后端主题，但仍需要讨论一些前端注意事项。最重要的是，拥有一个可传递无限制数据量的API会带来问题。一个普遍的问题是，整个数据集的渲染速度真的很慢，或者只是分块进行，而部分数据却未被使用。</p>
+<p>为了避免上述问题，某些API允许分页。以最简单的形式，您将页码传达给API，然后API计算出数据集中的偏移量。为了获得可靠的分页和最大的灵活性，分页机制实际上应使用一个指针-最后发射的数据项的标记。</p>
+<p>若要在Wijmo数据网格中包含分页的API，请使用ICollectionView实例。如果您的API支持OData，则只需使用ODataCollectionView即可完成此任务。</p>
+<p>例如，以下视图每页提供六个项目：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;font color=<span class="string">&quot;#000000&quot;</span>&gt;<span class="keyword">const</span> view = <span class="keyword">new</span> ODataCollectionView(url, <span class="string">&#x27;Customers&#x27;</span>, &#123;</span><br><span class="line">  <span class="attr">pageSize</span>: <span class="number">6</span>,</span><br><span class="line">  <span class="attr">pageOnServer</span>: <span class="literal">true</span>,</span><br><span class="line">  <span class="attr">sortOnServer</span>: <span class="literal">true</span>,</span><br><span class="line">&#125;);&lt;/font&gt;</span><br></pre></td></tr></table></figure>
+
+<p>通常，标准CollectionView也可以用于异步数据加载：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;font color=<span class="string">&quot;#000000&quot;</span>&gt;<span class="keyword">const</span> [view, setView] = React.useState(<span class="function">() =&gt;</span> <span class="keyword">new</span> CollectionView());</span><br><span class="line"></span><br><span class="line">React.useEffect(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">  fetch(<span class="string">&#x27;https://jsonplaceholder.typicode.com/posts&#x27;</span>)</span><br><span class="line">    .then(<span class="function"><span class="params">res</span> =&gt;</span> res.json())</span><br><span class="line">    .then(<span class="function"><span class="params">posts</span> =&gt;</span> setView(<span class="function"><span class="params">view</span> =&gt;</span> &#123;</span><br><span class="line">      view.sourceCollection = data;</span><br><span class="line">      <span class="keyword">return</span> view;</span><br><span class="line">    &#125;));</span><br><span class="line">&#125;, []);</span><br><span class="line"></span><br><span class="line"><span class="comment">// render datagrid&lt;/font&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>上面的代码并不完美：异步操作应使用处置程序进行适当清理。更好的useEffect版本是：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;font color=<span class="string">&quot;#000000&quot;</span>&gt;React.useEffect(<span class="function">() =&gt;</span> &#123;  </span><br><span class="line">  <span class="keyword">const</span> controller = <span class="keyword">new</span> AbortController();  </span><br><span class="line">  <span class="keyword">const</span> &#123; signal &#125; = controller;</span><br><span class="line"></span><br><span class="line">  fetch(<span class="string">&#x27;https://jsonplaceholder.typicode.com/posts&#x27;</span>, &#123; signal &#125;)  </span><br><span class="line">    .then(<span class="function"><span class="params">res</span> =&gt;</span> res.json())  </span><br><span class="line">    .then(<span class="comment">/* ... */</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="function">() =&gt;</span> controller.abort();  </span><br><span class="line">&#125;, []);&lt;/font&gt;</span><br></pre></td></tr></table></figure>
+
+<p>除了直接调用API外，您可能还会担心跨域资源共享（CORS）。CORS是浏览器中的一种安全机制，会影响对当前域以外的域的执行请求。</p>
+<p>除了隐式CORS请求和响应模式（包括所谓的飞行前请求）外，一个关键方面是通过cookie传递凭据。默认情况下，凭据仅发送给同源来源的请求。</p>
+<p>如果服务正确响应预检（OPTIONS）请求，则以下内容还将凭据传递给其他服务：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;font color=<span class="string">&quot;#000000&quot;</span>&gt;fetch(<span class="string">&#x27;https://jsonplaceholder.typicode.com/posts&#x27;</span>, &#123; <span class="attr">credentials</span>: <span class="string">&#x27;include&#x27;</span> &#125;)&lt;/font&gt;</span><br></pre></td></tr></table></figure>
+
+<p>到目前为止，已在安装组件时完成了数据调用。此方法不理想。它不仅意味着总是需要等待数据，而且还使得取消和其他流程难以实施。</p>
+<p>您需要的是一些全局数据状态，可以轻松地（独立于特定组件的生命周期）对其进行访问和更改。虽然状态容器解决方案（例如Redux）是最受欢迎的选择，但还有其他更简单的选择。</p>
+<p>一种可能是使用Zustand （德语为“ state”）。您可以将所有与数据相关的活动建模为对全局定义的状态对象的操作。通过React钩子报告对该对象的更改。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">&lt;font color=<span class="string">&quot;#000000&quot;</span>&gt;<span class="comment">// state.js</span></span><br><span class="line"><span class="keyword">import</span> create <span class="keyword">from</span> <span class="string">&#x27;zustand&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> [useStore] = create(<span class="function"><span class="params">set</span> =&gt;</span> (&#123;</span><br><span class="line">  <span class="attr">data</span>: <span class="literal">undefined</span>,</span><br><span class="line">  <span class="attr">load</span>: <span class="function">() =&gt;</span></span><br><span class="line">    fetch(<span class="string">&#x27;https://jsonplaceholder.typicode.com/posts&#x27;</span>)</span><br><span class="line">      .then(<span class="function"><span class="params">res</span> =&gt;</span> res.json())</span><br><span class="line">      .then(<span class="function"><span class="params">posts</span> =&gt;</span> set(&#123; <span class="attr">data</span>: posts &#125;)),</span><br><span class="line">&#125;));</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> &#123; useStore &#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// datagrid.js</span></span><br><span class="line"><span class="keyword">import</span> &#123; useStore &#125; <span class="keyword">from</span> <span class="string">&#x27;./state&#x27;</span>;</span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="function"><span class="keyword">function</span> <span class="title">MyDataGridPage</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> data = useStore(<span class="function"><span class="params">state</span> =&gt;</span> state.data);</span><br><span class="line">  <span class="keyword">const</span> load = useStore(<span class="function"><span class="params">state</span> =&gt;</span> state.load);</span><br><span class="line">  <span class="keyword">const</span> view = <span class="keyword">new</span> CollectionView(data);</span><br><span class="line"></span><br><span class="line">  React.useEffect(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (!data) &#123;</span><br><span class="line">      load();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;, [data]);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> (</span><br><span class="line">    <span class="xml"><span class="tag">&lt;<span class="name">FlexGrid</span> <span class="attr">itemsSource</span>=<span class="string">&#123;view&#125;</span> /&gt;</span></span></span><br><span class="line">  );</span><br><span class="line">&#125;&lt;/font&gt;</span><br></pre></td></tr></table></figure>
+
+
+                <hr>
+
+                
+
+                <ul class="pager">
+                    
+                        <li class="previous">
+                            <a href="/2020/09/22/rn-The-Five-Dysfunctions/" data-toggle="tooltip" data-placement="top" title="《团队协作的五大障碍》读书笔记">&larr; Previous Post</a>
+                        </li>
+                    
+                    
+                        <li class="next">
+                            <a href="/2020/06/30/spjs-Implementation-and-component-encapsulation-of-cross-sheet-format-painter/" data-toggle="tooltip" data-placement="top" title="跨sheet格式刷的实现和组件化封装">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                
+
+                
+
+            </div>
+    <!-- Side Catalog Container -->
+        
+
+    <!-- Sidebar Container -->
+
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#React" title="React">React</a>
+                        
+                          <a class="tag" href="/tags/#Grids" title="Grids">Grids</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+            </div>
+
+        </div>
+    </div>
+</article>
+
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'always',
+          placement: 'right',
+          icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://www.linkedin.com/in/kevin-chenkaihua">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://github.com/Gameckh">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://www.instagram.com/kevin.chenkh">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-instagram fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; KevinChen&#39;s Blog 2023
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+
+<script src="/js/jquery.min.js"></script>
+
+
+<!-- Bootstrap Core JavaScript -->
+
+<script src="/js/bootstrap.min.js"></script>
+
+
+<!-- Custom Theme JavaScript -->
+
+<script src="/js/hux-blog.min.js"></script>
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("https://gameckh.github.io/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+
+
+<!-- Baidu Tongji -->
+
+
+<!-- Side Catalog -->
+
+
+<div id="totop" style="position:fixed;bottom:50px;right:30px;">
+  <a title="返回顶部"><img style="cursor: pointer;" src="/img/scrollup.png"/></a>
+</div>
+
+<script src="/js/totop.js"></script>
+
+
+
+<!-- Image to hack wechat -->
+<img src="https://gameckh.github.io/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

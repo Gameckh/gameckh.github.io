@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword"  content="">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+          利用稀疏矩阵节省内存占用 - KevinChen&#39;s Blog
+        
+    </title>
+
+    <link rel="canonical" href="https://gameckh.github.io/2022/10/08/tech-use-sparse-table-to-conserve-memory-usage/">
+
+    <!-- Bootstrap Core CSS -->
+    
+<link rel="stylesheet" href="/css/bootstrap.min.css">
+
+
+    <!-- Custom CSS -->
+    
+<link rel="stylesheet" href="/css/hux-blog.min.css">
+
+
+    <!-- Pygments Highlight CSS -->
+    
+<link rel="stylesheet" href="/css/highlight.css">
+
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">KevinChen&#39;s Blog</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About My Blog</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archives/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    
+<!-- Image to hack wechat -->
+<!-- <img src="https://gameckh.github.io/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="{{ site.baseurl }}/{% if page.header-img %}{{ page.header-img }}{% else %}{{ site.header-img }}{% endif %}" width="0" height="0"> -->
+
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        background-image: url('post-bg.png')
+    }
+</style>
+<header class="intro-header" >
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                          <a class="tag" href="/tags/#Optimization" title="Optimization">Optimization</a>
+                        
+                          <a class="tag" href="/tags/#Algorithms" title="Algorithms">Algorithms</a>
+                        
+                          <a class="tag" href="/tags/#Sparse table" title="Sparse table">Sparse table</a>
+                        
+                    </div>
+                    <h1>利用稀疏矩阵节省内存占用</h1>
+                    <h2 class="subheading">Using Sparse Table to Conserve Memory Usage</h2>
+                    <span class="meta">
+                        Posted by Kevin on
+                        2022-10-08
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <p><strong>稀疏矩阵的概念</strong></p>
+<p>一个m×n的矩阵是一个由m行n列元素排列成的矩形阵列。矩阵里的元素可以是数字、符号及其他的类型的元素。</p>
+<p>一般来说，在矩阵中，若数值为0的元素数目远远多于非0元素的数目，并且非0元素分布没有规律时，则称该矩阵为稀疏矩阵；与之相反，若非0元素数目占大多数时，则称该矩阵为稠密矩阵。定义非零元素的总数比上矩阵所有元素的总数为矩阵的稠密度，下面的矩阵就是一个典型的稀疏矩阵。</p>
+<blockquote>
+<p>Origin: <a target="_blank" rel="noopener" href="https://www.grapecity.com.cn/blogs/spreadjs-use-sparse-matrices-to-save-memory-usage">https://www.grapecity.com.cn/blogs/spreadjs-use-sparse-matrices-to-save-memory-usage</a></p>
+</blockquote>
+<p><img src="001.png"></p>
+<p>我们日常使用的电子表格也是一个典型的稀疏矩阵场景，电子表格（SpreadJS, Excel，Google Sheet等等），整体看起来像一个table表格。</p>
+<p>其中列名称依次为A, B, C … …， 行名称依次为1, 2, 3 … …</p>
+<p>举例一个比较极端的场景，在A1和ZZ2000单元格分别赋值，这样我们就需要一个2000行，26*26+26=702列的矩阵来表示它，这个矩阵是一个明显的稀疏矩阵。</p>
+<p><strong>稀疏矩阵的存储方式及优化</strong></p>
+<ul>
+<li><p>直接存储为二维矩阵</p>
+<p>  直接使用二维矩阵会简单直接地存储整个电子表格，这样你不必每次都创建或删除一段内存。但这是一种非常暴力的存储值的方法，这种方式下会消耗大量内容来存储毫无内容的单元格。简单来看一下它的复杂度：</p>
+<ul>
+<li>占用空间：O(N2)</li>
+<li>插入数据：需要破坏矩阵.</li>
+<li>删除数据：需要破坏矩阵.</li>
+<li>搜索数据：O(N2)</li>
+<li>访问数据：O(1)</li>
+</ul>
+<p>  N是假设行和列具有相同长度并形成正方形矩阵的行/列数。</p>
+</li>
+<li><p>通过键值对(Map, Dictionary)优化</p>
+<p>  在这种方法中，只有在单元格有值时，我们才将单元格的值和位置存储在一起，使用HashMap或者Dictionary这些数据结构可以很容易的做到。</p>
+<p>  下图我们可以看到，键值对中分别存储了单元格位置和单元格值。</p>
+<p>  <img src="002.png"></p>
+<p>  来看一下它的复杂度：</p>
+<ul>
+<li>空间：O(N)</li>
+<li>插入：O(1)</li>
+<li>删除：O(1)</li>
+<li>搜索：O(N)</li>
+<li>访问：O(1)</li>
+</ul>
+<p>  N为所记录的条目数。</p>
+</li>
+<li><p>通过稀疏矩阵存储方式优化</p>
+<p>  在稀疏矩阵中，我们可以使用三个不同的数组来存储行索引、列偏移、和其中的值，而不是直接在二维矩阵中存储值。以这种方式按列压缩稀疏矩阵存储的三个数组：</p>
+<ul>
+<li>值 =&gt;单元格中的值。</li>
+<li>行索引=&gt;单元格的行索引。</li>
+<li>列偏移=&gt;这里每个索引都代表列，并且该数组将行开始的索引值存储在 Row 数组中。</li>
+</ul>
+<p>  左图中的稀疏矩阵被存储为右图的三个数组：</p>
+<p>  <img src="003.png"></p>
+<p>  稀疏矩阵具体的插入、删除、搜索、访问的代码，大家可以自己来搜索，这方面的资料网上有很多，这里不一一列举。</p>
+<p>  和上面一样，来看看这种方式的复杂度：</p>
+<ul>
+<li>空间：O(N)</li>
+<li>插入：O(N)</li>
+<li>删除：O(N)</li>
+<li>搜索：O(N)</li>
+<li>访问：O(1)</li>
+</ul>
+<p>  相较于传统的数组存储或是键值对存储，稀疏矩阵存储构建了基于行索引为 Key 的数据字典，在松散布局的表格数据中，稀疏矩阵只会对非空数据进行存储，而不需要对空数据开辟额外的内存空间。使用这种特殊的存储策略，使得数据片段化变得容易，可以随时框取整个数据层中的一片数据，进行序列化或反序列化。如果我们在项目开发中需要存储类似结构的数据，稀疏矩阵这种存储方式，无论从时间还是空间上都能大大的提成性能。</p>
+<p>  在葡萄城的 SpreadJS 和 GcExcel 表格组件中，也巧妙的使用了稀疏矩阵这一特性，可以随时替换或恢复整个存储结构中的任何一个级别的节点，以改变引用的方式更高效地解决表格数据回滚和恢复问题，而这一点也为葡萄城表格组件支持多人在线协同打下了一个良好的基础。</p>
+<p>  由于底层采用了稀疏矩阵来优化存储，SpreadJS在前端页面中，实现了100W级别数据秒级响应的能力：</p>
+<p>  <img src="004.gif"></p>
+</li>
+</ul>
+
+
+                <hr>
+
+                
+
+                <ul class="pager">
+                    
+                        <li class="previous">
+                            <a href="/2022/10/08/su-Corporate-Income-Tax-Declaration-System/" data-toggle="tooltip" data-placement="top" title="企业所得税申报系统的分析与解决方案">&larr; Previous Post</a>
+                        </li>
+                    
+                    
+                        <li class="next">
+                            <a href="/2022/09/22/su-React-SpringBoot-Quartz-Automatic-Reports/" data-toggle="tooltip" data-placement="top" title="React + SpringBoot + Quartz: 从0实现Excel报表自动化">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                
+
+                
+
+            </div>
+    <!-- Side Catalog Container -->
+        
+
+    <!-- Sidebar Container -->
+
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#Optimization" title="Optimization">Optimization</a>
+                        
+                          <a class="tag" href="/tags/#Algorithms" title="Algorithms">Algorithms</a>
+                        
+                          <a class="tag" href="/tags/#Sparse table" title="Sparse table">Sparse table</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+            </div>
+
+        </div>
+    </div>
+</article>
+
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'always',
+          placement: 'right',
+          icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://www.linkedin.com/in/kevin-chenkaihua">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://github.com/Gameckh">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://www.instagram.com/kevin.chenkh">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-instagram fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; KevinChen&#39;s Blog 2023
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+
+<script src="/js/jquery.min.js"></script>
+
+
+<!-- Bootstrap Core JavaScript -->
+
+<script src="/js/bootstrap.min.js"></script>
+
+
+<!-- Custom Theme JavaScript -->
+
+<script src="/js/hux-blog.min.js"></script>
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("https://gameckh.github.io/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+
+
+<!-- Baidu Tongji -->
+
+
+<!-- Side Catalog -->
+
+
+<div id="totop" style="position:fixed;bottom:50px;right:30px;">
+  <a title="返回顶部"><img style="cursor: pointer;" src="/img/scrollup.png"/></a>
+</div>
+
+<script src="/js/totop.js"></script>
+
+
+
+<!-- Image to hack wechat -->
+<img src="https://gameckh.github.io/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

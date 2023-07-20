@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword"  content="">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+          React + SpringBoot + Quartz: 从0实现Excel报表自动化 - KevinChen&#39;s Blog
+        
+    </title>
+
+    <link rel="canonical" href="https://gameckh.github.io/2022/09/22/su-React-SpringBoot-Quartz-Automatic-Reports/">
+
+    <!-- Bootstrap Core CSS -->
+    
+<link rel="stylesheet" href="/css/bootstrap.min.css">
+
+
+    <!-- Custom CSS -->
+    
+<link rel="stylesheet" href="/css/hux-blog.min.css">
+
+
+    <!-- Pygments Highlight CSS -->
+    
+<link rel="stylesheet" href="/css/highlight.css">
+
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">KevinChen&#39;s Blog</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About My Blog</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archives/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    
+<!-- Image to hack wechat -->
+<!-- <img src="https://gameckh.github.io/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="{{ site.baseurl }}/{% if page.header-img %}{{ page.header-img }}{% else %}{{ site.header-img }}{% endif %}" width="0" height="0"> -->
+
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        background-image: url('post-bg.jpg')
+    }
+</style>
+<header class="intro-header" >
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                          <a class="tag" href="/tags/#Solutions" title="Solutions">Solutions</a>
+                        
+                          <a class="tag" href="/tags/#React" title="React">React</a>
+                        
+                          <a class="tag" href="/tags/#SpringBoot" title="SpringBoot">SpringBoot</a>
+                        
+                          <a class="tag" href="/tags/#Automatic Reports" title="Automatic Reports">Automatic Reports</a>
+                        
+                    </div>
+                    <h1>React + SpringBoot + Quartz: 从0实现Excel报表自动化</h1>
+                    <h2 class="subheading">React + SpringBoot + Quartz: Implement Automatic Reports from scratch</h2>
+                    <span class="meta">
+                        Posted by Kevin on
+                        2022-09-22
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <blockquote>
+<p>企业日常工作中需要制作大量的报表，比如商品的销量、销售额、库存详情、员工打卡信息、保险报销、办公用品采购、差旅报销、项目进度等等，都需要制作统计图表以更直观地查阅。但是报表的制作往往需要耗费大量的时间，即使复用制作好的报表模版，一次次周期性对数据的复制粘贴操作也很耗人，同时模版在此过程中也会逐渐变得面目全非。</p>
+</blockquote>
+<blockquote>
+<p>Origin: <a target="_blank" rel="noopener" href="https://www.grapecity.com.cn/blogs/spreadjs-realize-excel-report-automation-from-0">https://www.grapecity.com.cn/blogs/spreadjs-realize-excel-report-automation-from-0</a><br>Official address: <a target="_blank" rel="noopener" href="https://www.grapecity.com.cn/developer/spreadjs/industry/lims">https://www.grapecity.com.cn/developer/spreadjs/industry/lims</a></p>
+</blockquote>
+<iframe src="//cdn.grapecity.com.cn/website-resources/files/blogs/2022/自动化报表V2.mp4" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"  width="700px" height="400px"> </iframe>
+
+<h2 id="一、项目背景"><a href="#一、项目背景" class="headerlink" title="一、项目背景"></a>一、项目背景</h2><p>企业日常工作中需要制作大量的报表，比如商品的销量、销售额、库存详情、员工打卡信息、保险报销、办公用品采购、差旅报销、项目进度等等，都需要制作统计图表以更直观地查阅。但是报表的制作往往需要耗费大量的时间，即使复用制作好的报表模版，一次次周期性对数据的复制粘贴操作也很耗人，同时模版在此过程中也会逐渐变得面目全非。</p>
+<p>基于此，我们需要挖掘数据背后隐藏的关联信息，将人工的常规性操作抽离出来，使用工具和代码去实现，这个过程就称之为报表自动化。葡萄城表格技术产品 纯前端表格控件 SpreadJS 和 服务端表格组件 GcExcel 高度兼容 Excel，可不依赖任何第三方组件实现 Excel 文档的导入导出，并提供类 Excel 的使用体验，可满足自动化报表中报表模板的批量处理、批量修改、数据汇总、批量浏览、打印、转换等各项功能开发需求。</p>
+<h2 id="二、报表自动化的优势"><a href="#二、报表自动化的优势" class="headerlink" title="二、报表自动化的优势"></a>二、报表自动化的优势</h2><p>报表自动化带来的价值有哪些呢？</p>
+<ol>
+<li><p>节省时间，提高效率</p>
+<p> 身处信息爆炸的时代，任何一家企业都有体量庞大、结构复杂、各种各样的数据，多类数据交互融合，对其进行分析经常伴随着大量人力资源的消耗。自动化报表通过合理的设计，独立出各个业务功能模块，后续重复引用该模块，实现重复操作的代码复用。</p>
+<p> 对于固定流程或逻辑的一些操作，计算机的执行速度是人力不可及的，为我们节省了时间，可以投入更有意义的工作。</p>
+</li>
+<li><p>降低出错率</p>
+<p> 人工操作总是受太多不可控因素影响，存在各种出错的潜在可能。与之相比，自动化意味着通过编码手段实现了持久化的逻辑、流程，经过重复的测试验证之后，便可完全信任该程序。在重复性的工作场景下机器产出的稳定性远高于人工操作。</p>
+</li>
+<li><p>时效性高</p>
+<p> 日报、周报、月报这种周期性的报表，人为操作很难控制时间的准确性，但是通过代码控制可以最大程度的保证其定点触发操作。</p>
+</li>
+</ol>
+<h2 id="三、系统功能点"><a href="#三、系统功能点" class="headerlink" title="三、系统功能点"></a>三、系统功能点</h2><ul>
+<li>任务配置灵活：支持根据业务需求，通过界面操作控制任务的启停状态，任务对应生成的文件类型等。</li>
+<li>报表模版设计自由：业务人员可根据对应任务配置的预览数据自定义报表模版，然后将其保存生效。</li>
+<li>前端预览：支持从前端预览报表详情。</li>
+<li>定时发送：定时生成报表文件并将其同步到微信群。</li>
+<li>支持多种类型：支持Excel、PDF、图表等文件类型的报表格式。</li>
+<li>数据自动抽取：动态读取数据库中的数据生成报表。</li>
+<li>模版和数据独立存储：使用在线表格设计器编辑模版，存储时只保存模版，数据从数据库加载。</li>
+</ul>
+<h2 id="四、方案设计"><a href="#四、方案设计" class="headerlink" title="四、方案设计"></a>四、方案设计</h2><ol>
+<li><p>整体流程</p>
+<p> 报表自动化的起点是能对接数据源，期间能自动化的生成事先设计好格式的报表，最终通过企业微信自动推送消息。具体流程可以分为3个步骤：</p>
+<ul>
+<li><p>报表模版设计：借助SpreadJS的在线表格编辑器设计模版。</p>
+</li>
+<li><p>对接数据源：从数据库中读取数据，动态适配数据模版。</p>
+</li>
+<li><p>自动化过程实现：利用定时任务，定时捞取数据，借助GcExcel生成对应类型的文件，通过对接企业微信的API，将文件同步到微信群。</p>
+</li>
+</ul>
+</li>
+<li><p>技术栈</p>
+<p> 前端：react+spreadJs 后端：Java+GcExcel+mysql+Quartz</p>
+</li>
+<li><p>具体实现</p>
+<p> 3.1. 数据库表设计</p>
+<p> PS：此为测试demo，故没有创建主键索引之外的索引。</p>
+<ul>
+<li><p>任务配置列表 task_config</p>
+<p>  依赖Quartz组件实现定时任务。读取任务配置表中启动状态的任务配置，按照任务类型读取对应数据源的增量更新数据。</p>
+<table>
+<thead>
+<tr>
+<th>字段名称</th>
+<th>字段类型</th>
+<th>字段含义</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>id</td>
+<td>long</td>
+<td>ID</td>
+<td>自增主键</td>
+</tr>
+<tr>
+<td>task_id</td>
+<td>varchar</td>
+<td>任务ID</td>
+<td></td>
+</tr>
+<tr>
+<td>task_type</td>
+<td>varchar</td>
+<td>任务类型</td>
+<td>和任务内容对应，比如订单/物流单信息</td>
+</tr>
+<tr>
+<td>task_name</td>
+<td>varchar</td>
+<td>任务名称</td>
+<td></td>
+</tr>
+<tr>
+<td>task_status</td>
+<td>int</td>
+<td>任务状态</td>
+<td>1:启动 0:终止 只有启动状态的配置才能生成任务信息</td>
+</tr>
+<tr>
+<td>task_context</td>
+<td>text</td>
+<td>任务内容</td>
+<td>模版信息，按照模版绑定数据源</td>
+</tr>
+<tr>
+<td>save_type</td>
+<td>char</td>
+<td>保存类型</td>
+<td>保存文件的类型</td>
+</tr>
+<tr>
+<td>time_span</td>
+<td>int</td>
+<td>执行任务的时间间隔</td>
+<td>单位s</td>
+</tr>
+<tr>
+<td>operator</td>
+<td>char</td>
+<td>操作者</td>
+<td>便于追溯</td>
+</tr>
+<tr>
+<td>create_time</td>
+<td>dateTime</td>
+<td>创建时间</td>
+<td></td>
+</tr>
+<tr>
+<td>update_time</td>
+<td>dateTime</td>
+<td>更新时间</td>
+<td></td>
+</tr>
+</tbody></table>
+  <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> `task_config` (</span><br><span class="line">    `id` <span class="type">INT</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> AUTO_INCREMENT COMMENT <span class="string">&#x27;自增主键&#x27;</span>,</span><br><span class="line">    `task_id` <span class="type">VARCHAR</span>(<span class="number">64</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;&#x27;</span> COMMENT <span class="string">&#x27;任务ID&#x27;</span>,</span><br><span class="line">    `task_type` <span class="type">VARCHAR</span>(<span class="number">64</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;&#x27;</span> COMMENT <span class="string">&#x27;任务类型&#x27;</span>,</span><br><span class="line">    `task_name` <span class="type">VARCHAR</span>(<span class="number">128</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;&#x27;</span> COMMENT <span class="string">&#x27;任务名称&#x27;</span>,</span><br><span class="line">    `task_status` TINYINT(<span class="number">4</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="number">0</span> COMMENT <span class="string">&#x27;任务状态：1:启动   0:终止&#x27;</span>,</span><br><span class="line">    `task_context` text COMMENT <span class="string">&#x27;任务模版信息&#x27;</span>,</span><br><span class="line">    `time_span` TINYINT(<span class="number">4</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="number">0</span> COMMENT <span class="string">&#x27;时间间隔，单位s&#x27;</span>,</span><br><span class="line">    `operator` <span class="type">VARCHAR</span>(<span class="number">64</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;&#x27;</span> COMMENT <span class="string">&#x27;操作人&#x27;</span>,</span><br><span class="line">    `create_time` DATETIME <span class="keyword">DEFAULT</span> <span class="built_in">CURRENT_TIMESTAMP</span> COMMENT <span class="string">&#x27;创建时间&#x27;</span>,</span><br><span class="line">    `update_time` DATETIME <span class="keyword">DEFAULT</span> <span class="built_in">CURRENT_TIMESTAMP</span> <span class="keyword">ON</span> UPDATE <span class="built_in">CURRENT_TIMESTAMP</span> COMMENT <span class="string">&#x27;更新时间&#x27;</span>,</span><br><span class="line">    <span class="keyword">PRIMARY</span> KEY (`id`) <span class="keyword">USING</span> BTREE</span><br><span class="line">)  ENGINE<span class="operator">=</span>INNODB <span class="keyword">DEFAULT</span> CHARSET<span class="operator">=</span>UTF8MB4 COMMENT<span class="operator">=</span><span class="string">&#x27;任务配置表&#x27;</span>;</span><br></pre></td></tr></table></figure></li>
+<li><p>订单信息表 order</p>
+<p>  订单相关数据源信息，对应订单类的报表任务。</p>
+<table>
+<thead>
+<tr>
+<th>字段名称</th>
+<th>字段类型</th>
+<th>字段含义</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ID</td>
+<td>long</td>
+<td>自增ID</td>
+<td></td>
+</tr>
+<tr>
+<td>order_id</td>
+<td>char</td>
+<td>订单号</td>
+<td></td>
+</tr>
+<tr>
+<td>order_amount</td>
+<td>decimal</td>
+<td>订单金额</td>
+<td></td>
+</tr>
+<tr>
+<td>order_discount</td>
+<td>decimal</td>
+<td>订单优惠金额</td>
+<td></td>
+</tr>
+<tr>
+<td>shipping_fee</td>
+<td>decimal</td>
+<td>订单运费</td>
+<td></td>
+</tr>
+<tr>
+<td>receiver_name</td>
+<td>varchar</td>
+<td>下单人姓名</td>
+<td></td>
+</tr>
+<tr>
+<td>receiver_state</td>
+<td>varchar</td>
+<td>省</td>
+<td></td>
+</tr>
+<tr>
+<td>receiver_city</td>
+<td>varchar</td>
+<td>市</td>
+<td></td>
+</tr>
+<tr>
+<td>receiver_district</td>
+<td>varchar</td>
+<td>区</td>
+<td></td>
+</tr>
+<tr>
+<td>receiver_address</td>
+<td>varchar</td>
+<td>详细地址</td>
+<td></td>
+</tr>
+<tr>
+<td>create_time</td>
+<td>dateTime</td>
+<td>创建时间</td>
+<td></td>
+</tr>
+<tr>
+<td>update_time</td>
+<td>dateTime</td>
+<td>更新时间</td>
+<td></td>
+</tr>
+</tbody></table>
+  <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> `<span class="keyword">order</span>` (</span><br><span class="line">    `id` <span class="type">INT</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> AUTO_INCREMENT COMMENT <span class="string">&#x27;自增主键&#x27;</span>,</span><br><span class="line">    `order_id` <span class="type">VARCHAR</span>(<span class="number">64</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;&#x27;</span> COMMENT <span class="string">&#x27;订单ID&#x27;</span>,</span><br><span class="line">    `order_amount` <span class="type">DECIMAL</span> <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="number">0</span> COMMENT <span class="string">&#x27;订单金额&#x27;</span>,</span><br><span class="line">    `order_discount` <span class="type">DECIMAL</span> <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="number">0</span> COMMENT <span class="string">&#x27;订单折扣金额&#x27;</span>,</span><br><span class="line">    `shipping_fee` <span class="type">DECIMAL</span> <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="number">0</span> COMMENT <span class="string">&#x27;运费&#x27;</span>,</span><br><span class="line">    `receiver_name` <span class="type">VARCHAR</span>(<span class="number">64</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;&#x27;</span> COMMENT <span class="string">&#x27;收件人姓名&#x27;</span>,</span><br><span class="line">    `receiver_state` <span class="type">VARCHAR</span>(<span class="number">64</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;&#x27;</span> COMMENT <span class="string">&#x27;省&#x27;</span>,</span><br><span class="line">    `receiver_city` <span class="type">VARCHAR</span>(<span class="number">64</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;&#x27;</span> COMMENT <span class="string">&#x27;市&#x27;</span>,</span><br><span class="line">    `receiver_district` <span class="type">VARCHAR</span>(<span class="number">64</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;&#x27;</span> COMMENT <span class="string">&#x27;区&#x27;</span>,</span><br><span class="line">    `receiver_address` <span class="type">VARCHAR</span>(<span class="number">128</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;&#x27;</span> COMMENT <span class="string">&#x27;详细地址&#x27;</span>,</span><br><span class="line">    `create_time` DATETIME <span class="keyword">DEFAULT</span> <span class="built_in">CURRENT_TIMESTAMP</span> COMMENT <span class="string">&#x27;创建时间&#x27;</span>,</span><br><span class="line">    `update_time` DATETIME <span class="keyword">DEFAULT</span> <span class="built_in">CURRENT_TIMESTAMP</span> <span class="keyword">ON</span> UPDATE <span class="built_in">CURRENT_TIMESTAMP</span> COMMENT <span class="string">&#x27;更新时间&#x27;</span>,</span><br><span class="line">    <span class="keyword">PRIMARY</span> KEY (`id`) <span class="keyword">USING</span> BTREE</span><br><span class="line">)  ENGINE<span class="operator">=</span>INNODB <span class="keyword">DEFAULT</span> CHARSET<span class="operator">=</span>UTF8MB4 COMMENT<span class="operator">=</span><span class="string">&#x27;订单表&#x27;</span>;</span><br></pre></td></tr></table></figure></li>
+<li><p>发货单表 waybill</p>
+<p>  发货单相关数据源信息，对应发货单类的报表任务。</p>
+<table>
+<thead>
+<tr>
+<th>字段名称</th>
+<th>字段类型</th>
+<th>字段含义</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ID</td>
+<td>long</td>
+<td>自增ID</td>
+<td></td>
+</tr>
+<tr>
+<td>order_id</td>
+<td>char</td>
+<td>订单号</td>
+<td></td>
+</tr>
+<tr>
+<td>waybill_id</td>
+<td>char</td>
+<td>物流单号ID</td>
+<td></td>
+</tr>
+<tr>
+<td>express_sn</td>
+<td>varchar</td>
+<td>物流编号</td>
+<td></td>
+</tr>
+<tr>
+<td>express_name</td>
+<td>varchar</td>
+<td>物流公司</td>
+<td></td>
+</tr>
+<tr>
+<td>receiver_name</td>
+<td>varchar</td>
+<td>下单人姓名</td>
+<td></td>
+</tr>
+<tr>
+<td>receiver_state</td>
+<td>varchar</td>
+<td>省</td>
+<td></td>
+</tr>
+<tr>
+<td>receiver_city</td>
+<td>varchar</td>
+<td>市</td>
+<td></td>
+</tr>
+<tr>
+<td>receiver_district</td>
+<td>varchar</td>
+<td>区</td>
+<td></td>
+</tr>
+<tr>
+<td>receiver_address</td>
+<td>varchar</td>
+<td>详细地址</td>
+<td></td>
+</tr>
+<tr>
+<td>out_time</td>
+<td>dateTime</td>
+<td>发货时间</td>
+<td></td>
+</tr>
+<tr>
+<td>create_time</td>
+<td>dateTime</td>
+<td>创建时间</td>
+<td></td>
+</tr>
+<tr>
+<td>update_time</td>
+<td>dateTime</td>
+<td>更新时间</td>
+<td></td>
+</tr>
+</tbody></table>
+  <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> `waybill` (</span><br><span class="line">    `id` <span class="type">INT</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> AUTO_INCREMENT COMMENT <span class="string">&#x27;自增主键&#x27;</span>,</span><br><span class="line">    `order_id` <span class="type">VARCHAR</span>(<span class="number">64</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;&#x27;</span> COMMENT <span class="string">&#x27;订单ID&#x27;</span>,</span><br><span class="line">    `waybill_id` <span class="type">VARCHAR</span>(<span class="number">64</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;&#x27;</span> COMMENT <span class="string">&#x27;发货单ID&#x27;</span>,</span><br><span class="line">    `express_sn` <span class="type">VARCHAR</span>(<span class="number">128</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;&#x27;</span> COMMENT <span class="string">&#x27;物流单号&#x27;</span>,</span><br><span class="line">    `express_name` <span class="type">VARCHAR</span>(<span class="number">64</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;&#x27;</span> COMMENT <span class="string">&#x27;物流公司名称&#x27;</span>,</span><br><span class="line">    `receiver_name` <span class="type">VARCHAR</span>(<span class="number">64</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;&#x27;</span> COMMENT <span class="string">&#x27;收件人姓名&#x27;</span>,</span><br><span class="line">    `receiver_state` <span class="type">VARCHAR</span>(<span class="number">64</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;&#x27;</span> COMMENT <span class="string">&#x27;省&#x27;</span>,</span><br><span class="line">    `receiver_city` <span class="type">VARCHAR</span>(<span class="number">64</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;&#x27;</span> COMMENT <span class="string">&#x27;市&#x27;</span>,</span><br><span class="line">    `receiver_district` <span class="type">VARCHAR</span>(<span class="number">64</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;&#x27;</span> COMMENT <span class="string">&#x27;区&#x27;</span>,</span><br><span class="line">    `receiver_address` <span class="type">VARCHAR</span>(<span class="number">128</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;&#x27;</span> COMMENT <span class="string">&#x27;详细地址&#x27;</span>,</span><br><span class="line">    `out_time` DATETIME <span class="keyword">DEFAULT</span> <span class="built_in">CURRENT_TIMESTAMP</span> COMMENT <span class="string">&#x27;发货时间&#x27;</span>,</span><br><span class="line">    `create_time` DATETIME <span class="keyword">DEFAULT</span> <span class="built_in">CURRENT_TIMESTAMP</span> COMMENT <span class="string">&#x27;创建时间&#x27;</span>,</span><br><span class="line">    `update_time` DATETIME <span class="keyword">DEFAULT</span> <span class="built_in">CURRENT_TIMESTAMP</span> <span class="keyword">ON</span> UPDATE <span class="built_in">CURRENT_TIMESTAMP</span> COMMENT <span class="string">&#x27;更新时间&#x27;</span>,</span><br><span class="line">    <span class="keyword">PRIMARY</span> KEY (`id`) <span class="keyword">USING</span> BTREE</span><br><span class="line">)  ENGINE<span class="operator">=</span>INNODB <span class="keyword">DEFAULT</span> CHARSET<span class="operator">=</span>UTF8MB4 COMMENT<span class="operator">=</span><span class="string">&#x27;发货单表&#x27;</span>;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p> 3.2 功能拆解</p>
+<ul>
+<li><p>前端实现</p>
+<p>  前端使用React框架，嵌入了SpreadJS组件，初始化时从后端读取任务配置列表数据并展示。可从前端配置任务规则，主要是配置模版信息。</p>
+</li>
+<li><p>后端</p>
+<p>  后端是一个SpringBoot项目，嵌入GcExcel组件对编辑、导出等操作，同时借助Quartz定时任务调度框架实现定时任务的管理，并接入了企业微信暴露的群机器人消息对接API，发送消息到企业微信群。</p>
+<p>  定时任务调度框架Quartz.</p>
+<p>  Quartz的三个核心概念：调度器、任务、触发器，三者之间的关系是：</p>
+<p>  一个作业，比较重要的三个要素就是Scheduler，JobDetail，Trigger；而Trigger对于Job而言就好比一个驱动器，没有触发器来定时驱动作业，作业就无法运行；对于Job而言，一个Job可以对应多个Trigger，但对于Trigger而言，一个Trigger只能对应一个Job，所以一个Trigger只能被指派给一个Job；如果你需要一个更复杂的触发计划，可以创建多个Trigger并指派它们给同一个Job。</p>
+<p>  <img src="001.png"></p>
+<p>  调度器的主要API:</p>
+  <figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//绑定jobDetail与trigger</span></span><br><span class="line">scheduler.schedule<span class="constructor">Job(<span class="params">jobDetail</span>, <span class="params">trigger</span>)</span>;</span><br><span class="line"><span class="comment">//检查JobDetail是否存在 </span></span><br><span class="line">scheduler.check<span class="constructor">Exists(JobKey.<span class="params">jobKey</span>(<span class="params">name</span>, <span class="params">group</span>)</span>)  </span><br><span class="line"><span class="comment">//检查Trigger是否存在      </span></span><br><span class="line">scheduler.check<span class="constructor">Exists(TriggerKey.<span class="params">triggerKey</span>(<span class="params">name</span>, <span class="params">group</span>)</span>) </span><br><span class="line"><span class="comment">//删除jobDetail       </span></span><br><span class="line">scheduler.delete<span class="constructor">Job(JobKey.<span class="params">jobKey</span>(<span class="params">name</span>, <span class="params">group</span>)</span>) </span><br><span class="line"><span class="comment">//立即执行一次指定的任务               </span></span><br><span class="line">scheduler.trigger<span class="constructor">Job(JobKey.<span class="params">jobKey</span>(<span class="params">name</span>, <span class="params">group</span>)</span>, dataMap) </span><br><span class="line"><span class="comment">//启动任务调度       </span></span><br><span class="line">scheduler.start<span class="literal">()</span>;       </span><br><span class="line"><span class="comment">//暂停指定的job         </span></span><br><span class="line">scheduler.pause<span class="constructor">Job(<span class="params">jobKey</span>)</span>;   </span><br><span class="line"><span class="comment">//任务调度挂起，即暂停操作     </span></span><br><span class="line">scheduler.standby<span class="literal">()</span>;   </span><br><span class="line"><span class="comment">//关闭任务调度，同shutdown(false)     </span></span><br><span class="line">scheduler.shutdown<span class="literal">()</span>;    </span><br><span class="line"><span class="comment">//表示等待所有正在执行的Job执行完毕之后，再关闭Scheduler    </span></span><br><span class="line">scheduler.shutdown(<span class="literal">true</span>);    </span><br><span class="line"><span class="comment">// 表示直接关闭Scheduler   </span></span><br><span class="line">scheduler.shutdown(<span class="literal">false</span>);</span><br></pre></td></tr></table></figure>
+
+<p>  定时任务触发规则：</p>
+<p>  &lt;1&gt; 使用cron表达式 定时发送</p>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Trigger trigger = TriggerBuilder.newTrigger()</span><br><span class="line">    .withIdentity(<span class="string">&quot;trigger1&quot;</span>, <span class="string">&quot;group1&quot;</span>)</span><br><span class="line">    .withSchedule(CronScheduleBuilder.cronSchedule(<span class="string">&quot;0/5 * * * * ?&quot;</span>))  <span class="comment">// 日历</span></span><br><span class="line">    .build();</span><br></pre></td></tr></table></figure>
+<p>  &lt;2&gt; 使用simpleTrigger触发器</p>
+<p>  为那种需要在特定的日期/时间启动，且以一个可能的间隔时间重复执行 n 次的 Job 所设计的。</p>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//立即开始执行，2秒执行一次，重复3次，3秒后结束执行（当重复次数或者结束时间有一个先达到时，就会停止执行）</span></span><br><span class="line">Trigger trigger = TriggerBuilder.newTrigger()</span><br><span class="line">        .withIdentity(<span class="string">&quot;trigger1&quot;</span>, <span class="string">&quot;triggerGroup1&quot;</span>)</span><br><span class="line">        .startNow()</span><br><span class="line">        .withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(<span class="number">2</span>).withRepeatCount(<span class="number">3</span>))</span><br><span class="line">        .endAt(<span class="keyword">new</span> Date(<span class="keyword">new</span> Date().getTime() + <span class="number">3000L</span>))</span><br><span class="line">        .build();</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ol>
+<h2 id="五、效果演示"><a href="#五、效果演示" class="headerlink" title="五、效果演示"></a>五、效果演示</h2><ol>
+<li><p>使用步骤说明：</p>
+<p> 整个页面布局可以分为两大部分，上半部分为从数据库中读取的任务配置列表，下半部分为SpreadJS的Designer模块。在前端配置任务规则后，后端服务会读取具体的任务配置信息，调度任务进行生产。整个操作可以分为以下几个步骤：</p>
+<ol>
+<li>读取任务配置数据到React表格中。</li>
+<li>选中特定的任务配置项，读取对应数据源的数据到Worksheet中展示。</li>
+<li>编辑报表任务模版并保存。</li>
+</ol>
+<p> 由于json文件是存储在mysql数据库表中的一个字段中，若字段太大会导致溢出且影响性能，故仅保存样式，后端进行数据源动态查询去适配生成报表。</p>
+</li>
+<li><p>视频演示:</p>
+<p> 见顶部视频演示。</p>
+</li>
+</ol>
+
+
+                <hr>
+
+                
+
+                <ul class="pager">
+                    
+                        <li class="previous">
+                            <a href="/2022/10/08/tech-use-sparse-table-to-conserve-memory-usage/" data-toggle="tooltip" data-placement="top" title="利用稀疏矩阵节省内存占用">&larr; Previous Post</a>
+                        </li>
+                    
+                    
+                        <li class="next">
+                            <a href="/2022/07/12/research-report-version-control-of-spreadsheets/" data-toggle="tooltip" data-placement="top" title="调研报告：表格文档版本管理">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                
+
+                
+
+            </div>
+    <!-- Side Catalog Container -->
+        
+
+    <!-- Sidebar Container -->
+
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#Solutions" title="Solutions">Solutions</a>
+                        
+                          <a class="tag" href="/tags/#React" title="React">React</a>
+                        
+                          <a class="tag" href="/tags/#SpringBoot" title="SpringBoot">SpringBoot</a>
+                        
+                          <a class="tag" href="/tags/#Automatic Reports" title="Automatic Reports">Automatic Reports</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+            </div>
+
+        </div>
+    </div>
+</article>
+
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'always',
+          placement: 'right',
+          icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://www.linkedin.com/in/kevin-chenkaihua">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://github.com/Gameckh">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://www.instagram.com/kevin.chenkh">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-instagram fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; KevinChen&#39;s Blog 2023
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+
+<script src="/js/jquery.min.js"></script>
+
+
+<!-- Bootstrap Core JavaScript -->
+
+<script src="/js/bootstrap.min.js"></script>
+
+
+<!-- Custom Theme JavaScript -->
+
+<script src="/js/hux-blog.min.js"></script>
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("https://gameckh.github.io/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+
+
+<!-- Baidu Tongji -->
+
+
+<!-- Side Catalog -->
+
+
+<div id="totop" style="position:fixed;bottom:50px;right:30px;">
+  <a title="返回顶部"><img style="cursor: pointer;" src="/img/scrollup.png"/></a>
+</div>
+
+<script src="/js/totop.js"></script>
+
+
+
+<!-- Image to hack wechat -->
+<img src="https://gameckh.github.io/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

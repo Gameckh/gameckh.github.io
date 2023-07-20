@@ -13,7 +13,7 @@
 
     <title>
         
-          专题：服务端Node.js运行SpreadJS处理Excel的方案探讨（一） - KevinChen&#39;s Blog
+          服务端Node.js运行SpreadJS处理Excel的方案探讨（一） - KevinChen&#39;s Blog
         
     </title>
 
@@ -96,13 +96,6 @@
 
                         
                         <li>
-                            <a href="/tags/">Tags</a>
-                        </li>
-                        
-                    
-
-                        
-                        <li>
                             <a href="/about/">About My Blog</a>
                         </li>
                         
@@ -111,6 +104,13 @@
                         
                         <li>
                             <a href="/archives/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
                         </li>
                         
                     
@@ -175,9 +175,11 @@
                         
                           <a class="tag" href="/tags/#Node.js" title="Node.js">Node.js</a>
                         
+                          <a class="tag" href="/tags/#Server rendering" title="Server rendering">Server rendering</a>
+                        
                     </div>
-                    <h1>专题：服务端Node.js运行SpreadJS处理Excel的方案探讨（一）</h1>
-                    <h2 class="subheading">如何在Node.js中运行SpreadJS</h2>
+                    <h1>服务端Node.js运行SpreadJS处理Excel的方案探讨（一）</h1>
+                    <h2 class="subheading">Solutions for Running SpreadJS on Server-Side Node.js(Part I)</h2>
                     <span class="meta">
                         Posted by Kevin on
                         2021-02-27
@@ -208,6 +210,9 @@
 <p>The strength of JavaScript is that you can do anything. The weakness is that you will.<br>JavaScript 的优点是可以写任何东西，缺点是你真的会用它去写这些东西。</p>
 </blockquote>
 <p>我们的技术团队在跟国内外各行业SpreadJS的用户交流中，发现有很多的用户尝试在用Node.js来实现在服务端运行SpreadJS。接下来咱们就一起探讨一下如何在Node.js中使用SpreadJS，以及它们结合的表现如何。</p>
+<blockquote>
+<p>Origin: <a target="_blank" rel="noopener" href="https://gcdn.grapecity.com.cn/showtopic-88009-1-1.html">https://gcdn.grapecity.com.cn/showtopic-88009-1-1.html</a></p>
+</blockquote>
 <h2 id="第一篇：如何从Node-js应用程序生成Excel电子表格"><a href="#第一篇：如何从Node-js应用程序生成Excel电子表格" class="headerlink" title="第一篇：如何从Node.js应用程序生成Excel电子表格"></a>第一篇：如何从Node.js应用程序生成Excel电子表格</h2><p>Node.js是流行的事件驱动的JavaScript Runtime，通常用于创建网络应用程序。它可以同时处理多个连接，并且不像其他大多数模型那样依赖线程。<br>在本教程中，我们将使用Spread.Sheets收集用户输入的信息，并将其自动导出到Excel文件——全部在你的Node.js应用程序中实现。<br>该项目的示例zip参考附件。</p>
 <p><img src="001.png"></p>
 <h4 id="SpreadJS和Node-js入门"><a href="#SpreadJS和Node-js入门" class="headerlink" title="SpreadJS和Node.js入门"></a>SpreadJS和Node.js入门</h4><p>首先，我们需要安装Node.js以及Mock-Browser，BufferJS和FileReader，如下链接所示：<br><a target="_blank" rel="noopener" href="https://nodejs.org/en/download/package-manager/">Installing Node.js viaPackage Manager</a><br><a target="_blank" rel="noopener" href="https://www.npmjs.com/package/mock-browser">Mock-Browser</a><br><a target="_blank" rel="noopener" href="https://registry.npmjs.org/bufferjs/-/bufferjs-1.0.0.tgz">BufferJS</a><br><a target="_blank" rel="noopener" href="https://www.npmjs.com/package/filereader">FileReader</a><br>我们将使用Visual Studio创建应用程序。打开Visual Studio后，使用JavaScript&gt; Node.js&gt;Blank Node.js控制台应用程序模板创建一个新应用程序。这将自动创建所需的文件并打开“app.js”文件，这是我们将要更改的唯一文件。<br>对于BufferJS库，您需要下载该软件包，然后通过导航到项目文件夹（一旦创建）并运行以下命令，将其手动安装到项目中：<br><code>npm install</code><br>安装完成后，您可能需要打开项目的package.json文件并将其添加到“ dependencies”部分。文件内容应如下所示：</p>
@@ -274,12 +279,12 @@
                 <ul class="pager">
                     
                         <li class="previous">
-                            <a href="/2021/03/01/spjs-SpreadJS-on-Nodejs-2/" data-toggle="tooltip" data-placement="top" title="专题：服务端Node.js运行SpreadJS处理Excel的方案探讨（二）">&larr; Previous Post</a>
+                            <a href="/2021/03/01/spjs-SpreadJS-on-Nodejs-2/" data-toggle="tooltip" data-placement="top" title="服务端Node.js运行SpreadJS处理Excel的方案探讨（二）">&larr; Previous Post</a>
                         </li>
                     
                     
                         <li class="next">
-                            <a href="/2021/02/02/spjs-collaboration-system-architecture/" data-toggle="tooltip" data-placement="top" title="协同文档实现的流程、架构图以及相关解释">Next Post &rarr;</a>
+                            <a href="/2021/02/02/gc-Issues-with-GcExcel-not-finding-fonts-in-Linux/" data-toggle="tooltip" data-placement="top" title="Linux系统下GcExcel找不到字体的问题">Next Post &rarr;</a>
                         </li>
                     
                 </ul>
@@ -309,6 +314,8 @@
                           <a class="tag" href="/tags/#SpreadJS" title="SpreadJS">SpreadJS</a>
                         
                           <a class="tag" href="/tags/#Node.js" title="Node.js">Node.js</a>
+                        
+                          <a class="tag" href="/tags/#Server rendering" title="Server rendering">Server rendering</a>
                         
                     </div>
                 </section>
@@ -380,13 +387,33 @@
                 
 
                 
-
-                
                     <li>
                         <a target="_blank"  href="https://www.linkedin.com/in/kevin-chenkaihua">
                             <span class="fa-stack fa-lg">
                                 <i class="fa fa-circle fa-stack-2x"></i>
                                 <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://github.com/Gameckh">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://www.instagram.com/kevin.chenkh">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-instagram fa-stack-1x fa-inverse"></i>
                             </span>
                         </a>
                     </li>

@@ -96,13 +96,6 @@
 
                         
                         <li>
-                            <a href="/tags/">Tags</a>
-                        </li>
-                        
-                    
-
-                        
-                        <li>
                             <a href="/about/">About My Blog</a>
                         </li>
                         
@@ -111,6 +104,13 @@
                         
                         <li>
                             <a href="/archives/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
                         </li>
                         
                     
@@ -173,9 +173,17 @@
                         
                           <a class="tag" href="/tags/#SpreadJS" title="SpreadJS">SpreadJS</a>
                         
+                          <a class="tag" href="/tags/#Canvas" title="Canvas">Canvas</a>
+                        
+                          <a class="tag" href="/tags/#HTML" title="HTML">HTML</a>
+                        
+                          <a class="tag" href="/tags/#PDF" title="PDF">PDF</a>
+                        
+                          <a class="tag" href="/tags/#Printing" title="Printing">Printing</a>
+                        
                     </div>
                     <h1>Canvas单元格内渲染HTML，并支持导出PDF和打印的实现方法</h1>
-                    <h2 class="subheading">HTML in Canvas Cells</h2>
+                    <h2 class="subheading">Methodology for rendering HTML within Canvas cells, with support for PDF export and printing.</h2>
                     <span class="meta">
                         Posted by Kevin on
                         2020-11-23
@@ -200,6 +208,9 @@
                 <blockquote>
 <p>HTML是Web页面中所有元素的载体，作为前端技术人员最为熟悉、也最基础的功能，如果能跟采用了Canvas技术的SpreadJS结合使用，那这种体验一定非常美妙，简直是开启了一个为所欲为的新世界。</p>
 </blockquote>
+<blockquote>
+<p>Origin: <a target="_blank" rel="noopener" href="https://gcdn.grapecity.com.cn/showtopic-83510-1-25.html">https://gcdn.grapecity.com.cn/showtopic-83510-1-25.html</a></p>
+</blockquote>
 <p>之前的Demo中采用了在自定义单元格的paint方法中生成图片，然后调用SpreadJS原生的canvas渲染图片的方式来实现在单元格中显示image，效果如图：<br><a target="_blank" rel="noopener" href="https://demo.grapecity.com.cn/SpreadJS/cdn/extendedExample/#/demos/htmlCell">原示例链接点我查看</a><br><img src="001.png"><br>（图中html代码片段可以通过设置allowCellOverflow = false 来关闭显示）</p>
 <p>这个示例的确能解决HTML渲染的问题，但是如果需要打印或者导出PDF时就没办法把渲染的内容导出来了。先说一个前提，SpreadJS的打印和导出PDF，都是“所见即所得”的，也就是说页面上的可视化元素都可以被导出PDF或输送给打印接口。这是SpreadJS的渲染机制支撑起来的功能。<br>但这里为什么就不灵了呢？</p>
 <p>关键问题出在image的渲染机制上。HTML为保证页面渲染的性能，对image元素的加载都是异步的，而输出结果时SpreadJS会调用相关区域的paint方法，对这一区域执行重绘（这是canvas的机制）。而在重绘期间，image还在等待，这样就会导致输出的结果中看不到image。</p>
@@ -218,12 +229,12 @@
                 <ul class="pager">
                     
                         <li class="previous">
-                            <a href="/2020/12/28/spjs-custom-formula-messages/" data-toggle="tooltip" data-placement="top" title="MutationObserver实现自定义公式提示信息">&larr; Previous Post</a>
+                            <a href="/2020/12/28/spjs-custom-formula-messages/" data-toggle="tooltip" data-placement="top" title="MutationObserver 实现自定义公式提示信息">&larr; Previous Post</a>
                         </li>
                     
                     
                         <li class="next">
-                            <a href="/2020/10/10/rn-Nonviolent-Communication/" data-toggle="tooltip" data-placement="top" title="非暴力沟通 读书笔记">Next Post &rarr;</a>
+                            <a href="/2020/10/21/spjs-data-binding-to-obtain-data-sources/" data-toggle="tooltip" data-placement="top" title="如何在填报场景中使用数据绑定获取数据源">Next Post &rarr;</a>
                         </li>
                     
                 </ul>
@@ -251,6 +262,14 @@
                     <div class="tags">
                        
                           <a class="tag" href="/tags/#SpreadJS" title="SpreadJS">SpreadJS</a>
+                        
+                          <a class="tag" href="/tags/#Canvas" title="Canvas">Canvas</a>
+                        
+                          <a class="tag" href="/tags/#HTML" title="HTML">HTML</a>
+                        
+                          <a class="tag" href="/tags/#PDF" title="PDF">PDF</a>
+                        
+                          <a class="tag" href="/tags/#Printing" title="Printing">Printing</a>
                         
                     </div>
                 </section>
@@ -322,13 +341,33 @@
                 
 
                 
-
-                
                     <li>
                         <a target="_blank"  href="https://www.linkedin.com/in/kevin-chenkaihua">
                             <span class="fa-stack fa-lg">
                                 <i class="fa fa-circle fa-stack-2x"></i>
                                 <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://github.com/Gameckh">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://www.instagram.com/kevin.chenkh">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-instagram fa-stack-1x fa-inverse"></i>
                             </span>
                         </a>
                     </li>

@@ -96,13 +96,6 @@
 
                         
                         <li>
-                            <a href="/tags/">Tags</a>
-                        </li>
-                        
-                    
-
-                        
-                        <li>
                             <a href="/about/">About My Blog</a>
                         </li>
                         
@@ -111,6 +104,13 @@
                         
                         <li>
                             <a href="/archives/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
                         </li>
                         
                     
@@ -173,11 +173,11 @@
                         
                           <a class="tag" href="/tags/#SpreadJS" title="SpreadJS">SpreadJS</a>
                         
-                          <a class="tag" href="/tags/#协同文档" title="协同文档">协同文档</a>
+                          <a class="tag" href="/tags/#collaborative documents" title="collaborative documents">collaborative documents</a>
                         
                     </div>
                     <h1>协同文档实现的流程、架构图以及相关解释</h1>
-                    <h2 class="subheading">———— 架构图和注解</h2>
+                    <h2 class="subheading">The process, architecture diagram, and relevant explanations for implementing collaborative documents</h2>
                     <span class="meta">
                         Posted by Kevin on
                         2021-02-02
@@ -202,6 +202,9 @@
                 <blockquote>
 <p>无论从哪个方面看，协同文档都是一个及其复杂的课题。自己毕竟实际参与过协同项目，这么有含金量的课题，不使劲水上一整个系列简直对不起自己（大雾）。<br>本篇只是协同系列的开端，仅仅简单总结了个架构，未来计划会从场景、分类、实现思路、难点分析等方面展开。</p>
 </blockquote>
+<blockquote>
+<p>Origin: <a target="_blank" rel="noopener" href="https://gcdn.grapecity.com.cn/showtopic-87102-1-1.html">https://gcdn.grapecity.com.cn/showtopic-87102-1-1.html</a></p>
+</blockquote>
 <p><strong>背景描述：</strong><br>自从2020年初疫情爆发以来，远程办公的需求急剧扩张，迅速形成了一个小风口。在这之前鲜有人问津的协同文档的实现，也开始频繁见到这样的需求。作为市场上最为主流的协同表格前（后）端所依赖的控件，SpreadJS支撑起了石墨文档、腾讯文档、飞书、语雀、科大讯飞、网易灵犀文档等一众互联网软件企业的协同表格文档产品。<br>协同是个非常大的话题，还不算相关程度比较高的版本管理功能，以后博客中会慢慢完善这些。</p>
 <p><strong>架构、流程图：</strong><br><img src="001.jpg"><br><img src="002.jpg"></p>
 <p><strong>关键名词注释:</strong><br>Command listener: 命令监听. SpreadJS 会把用户的操作封装成Command, **可以拿到用户执行操作时触发命令的json对象.<br>Clipboard listener: 剪贴板监听. 浏览器剪贴板的复制和粘贴是特殊操作, 需要在极短的窗口期内才能监听到, 需要特殊处理.<br>Command stack: 命令栈. 用户操作的行为被封装成命令后, 被维护在命令栈中, 以供撤销和回滚操作.<br>Command interpreter: 命令解释器. 用户的操作, 数据和自定义信息(例如用户信息, 权限等) 都被打包成 Command Json发回后端, 后端需要针对这个Command进行解释, 以便后端执行协同操作.<br>Create Snapshot: 创建快照. (图中有误, 第一个 Snapshot rollback -&gt; Create Snapshot)<br>Snapshot rollback: 回滚快照. 当用户执行撤回操作时, 实际上是回滚到指定的快照上.</p>
@@ -214,12 +217,12 @@
                 <ul class="pager">
                     
                         <li class="previous">
-                            <a href="/2021/02/27/spjs-SpreadJS-on-Nodejs-1/" data-toggle="tooltip" data-placement="top" title="专题：服务端Node.js运行SpreadJS处理Excel的方案探讨（一）">&larr; Previous Post</a>
+                            <a href="/2021/02/02/gc-Issues-with-GcExcel-not-finding-fonts-in-Linux/" data-toggle="tooltip" data-placement="top" title="Linux系统下GcExcel找不到字体的问题">&larr; Previous Post</a>
                         </li>
                     
                     
                         <li class="next">
-                            <a href="/2020/12/28/spjs-custom-formula-messages/" data-toggle="tooltip" data-placement="top" title="MutationObserver实现自定义公式提示信息">Next Post &rarr;</a>
+                            <a href="/2021/01/13/fc-Performance-Optimization-of-SpreadJS/" data-toggle="tooltip" data-placement="top" title="【公开课】SpreadJS 性能优化">Next Post &rarr;</a>
                         </li>
                     
                 </ul>
@@ -248,7 +251,7 @@
                        
                           <a class="tag" href="/tags/#SpreadJS" title="SpreadJS">SpreadJS</a>
                         
-                          <a class="tag" href="/tags/#协同文档" title="协同文档">协同文档</a>
+                          <a class="tag" href="/tags/#collaborative documents" title="collaborative documents">collaborative documents</a>
                         
                     </div>
                 </section>
@@ -320,13 +323,33 @@
                 
 
                 
-
-                
                     <li>
                         <a target="_blank"  href="https://www.linkedin.com/in/kevin-chenkaihua">
                             <span class="fa-stack fa-lg">
                                 <i class="fa fa-circle fa-stack-2x"></i>
                                 <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://github.com/Gameckh">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://www.instagram.com/kevin.chenkh">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-instagram fa-stack-1x fa-inverse"></i>
                             </span>
                         </a>
                     </li>

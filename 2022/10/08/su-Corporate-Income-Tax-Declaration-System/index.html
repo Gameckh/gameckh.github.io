@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword"  content="">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+          企业所得税申报系统的分析与解决方案 - KevinChen&#39;s Blog
+        
+    </title>
+
+    <link rel="canonical" href="https://gameckh.github.io/2022/10/08/su-Corporate-Income-Tax-Declaration-System/">
+
+    <!-- Bootstrap Core CSS -->
+    
+<link rel="stylesheet" href="/css/bootstrap.min.css">
+
+
+    <!-- Custom CSS -->
+    
+<link rel="stylesheet" href="/css/hux-blog.min.css">
+
+
+    <!-- Pygments Highlight CSS -->
+    
+<link rel="stylesheet" href="/css/highlight.css">
+
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">KevinChen&#39;s Blog</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About My Blog</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archives/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    
+<!-- Image to hack wechat -->
+<!-- <img src="https://gameckh.github.io/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="{{ site.baseurl }}/{% if page.header-img %}{{ page.header-img }}{% else %}{{ site.header-img }}{% endif %}" width="0" height="0"> -->
+
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        background-image: url('post-bg.jpg')
+    }
+</style>
+<header class="intro-header" >
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                          <a class="tag" href="/tags/#Solutions" title="Solutions">Solutions</a>
+                        
+                          <a class="tag" href="/tags/#Analysis" title="Analysis">Analysis</a>
+                        
+                          <a class="tag" href="/tags/#Business" title="Business">Business</a>
+                        
+                    </div>
+                    <h1>企业所得税申报系统的分析与解决方案</h1>
+                    <h2 class="subheading">Solution: Corporate Income Tax Declaration System</h2>
+                    <span class="meta">
+                        Posted by Kevin on
+                        2022-10-08
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <blockquote>
+<p>中国征税税种极为广泛，包括所得税（企业所得税和个人所得税）、间接税（增值税和消费税）、与房地产相关的税（土地增值税、房产税、耕地占用税和城镇土地使用税）和其它税种等。对于大部分个人来说，报税可能并不是十分繁杂。但对于企业来说，在不断演变的税收环境下，企业需要满足合规要求，减少税收风险，设计并实施最佳的税务优化方案。</p>
+</blockquote>
+<blockquote>
+<p>Origin: <a target="_blank" rel="noopener" href="https://www.grapecity.com.cn/blogs/spreadjs-scenarios-tax-filing-system">https://www.grapecity.com.cn/blogs/spreadjs-scenarios-tax-filing-system</a><br>Official address: <a target="_blank" rel="noopener" href="https://www.grapecity.com.cn/developer/spreadjs/industry/corporate-income-tax">https://www.grapecity.com.cn/developer/spreadjs/industry/corporate-income-tax</a></p>
+</blockquote>
+<p>大数据时代中，税务征管与时俱进，不同地区、不同行业每年优惠政策，报税模板文件都会有所调整。面对税收政策的变化以及企业业务发展，企业需要具备丰富的经验和睿智的远见，以做出最佳决策，实现税务目标。</p>
+<p>要实现这一目标，需要有一支能深入理解最新税务法的内涵和实务规则的税务服务团队，而这一点是大部分企业都难以具备的。同时，使用传统企业所得税申报方式、历史数据的填写、数据校验及对比分析等都是复杂且容易出错的。而报税过程一旦出错，将会给企业带来巨大的问题。这使得税务职能部门愈发认识到技术提高效率、改善纳税流程及管理风险的重要性。</p>
+<p>企业所得税申报与风险管控系统可以为企业构建高效且成本低廉的新方法以适应企业巨税务政策的发展和变化。结合科技力量及专业的税务团队和客户经验，企业所得税申报与风险管控系统将精简并自动处理年度企业所得税申报流程，使企业能够更好的管控税务数据，规避税务风险，提高企业报税效率。</p>
+<p><strong>企业所得税申报及管理系统业务流程：</strong></p>
+<ul>
+<li>数据采集：企业需提供相关的资料，例如营业执照正本及副本复印件、税务登记证正本及副本复印件、办公室租赁合同复印件、主管税务机构出具的企业所得 税税收优惠、当年应付职工工资清单</li>
+<li>数据匹配、分析、清理：自动匹配后仍出现于待匹配科目列表中的条目需人工复核</li>
+<li>自动计算及生成报表：工作底稿、企业所得税汇算清缴纳税填报表，纳税调整备忘录、税务分析报告</li>
+<li>自动填报并提交：税务局客户端或网页申报表</li>
+<li>数据追踪：税务局反馈录入系统，税务专业顾问及时跟进，讨论处理相关事宜</li>
+</ul>
+<p><strong>企业所得税申报及管理系统的优势：</strong></p>
+<ul>
+<li>自动高效：起始数据匹配在系统的支持和见一下一次性完成，一劳永逸，之后每年数据自动化匹</li>
+<li>追朔数据：保留历年的财务数据，纳税调整信息及税务机关对于申报的反馈，实现可靠的电子化文档归集</li>
+<li>降本有道：节约人力，自动生成工作底稿、所得税申报表（特殊事项需要人工补录）</li>
+<li>风险预查：先税务局一部进行年度企业所得税汇算清缴数据分析，生成企业所得税相关税务风险分析（直观的税务指标）预警报告，了解公司的税务情况</li>
+</ul>
+<p>上述内容介绍了企业所得税申报及管理系统的产生背景、业务流程以及优势。接下来，我们需要了解如何实现一个符合客户应用场景的税务申报系统。首先，大部分客户的历史数据都托管在Excel中。此外，税务申报表、报告表均以Excel形式来填写。因此，我们需要找到一个能在Web端实现类Excel操作的表格控件，使历史数据的提取展示，报表的生成能够完全迁移至Web端。如果该表格控件能兼具Excel的操作习惯，效果会更好，这样使用的业务人员就不需要任何培训成本，减少客户学习使用所需的时间。</p>
+<p>本文借助葡萄城前端类Excel表格控件SpreadJS来提供解决方案，SpreadJS官方提供了在线体验地址，可以直接在官网测试是否满足操作行为、展示上的要求。选择SpreadJS的原因很多，但主要原因有以下几点：</p>
+<ul>
+<li>操作行为高度类Excel，对Excel兼容度长期位于控件产品市场Top1</li>
+<li>支持历史文件导入；提供数据绑定提取显示数据</li>
+<li>商用产品，完善的技术文档，售前、售后支持及培训服务，使用无忧</li>
+<li>前端控件，随项目做集成部署，数据安全可靠。</li>
+</ul>
+<p>关于SpreadJS如何与自己的项目做集成，我们可以参考下列文章：</p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/powertoolsteam/p/16404841.html">基于Vite+React构建在线Excel</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/powertoolsteam/p/16359020.html">构建基于React18的电子表格</a></p>
+<p>集成完成之后，就可以做一些报税系统中核心的业务场景，接下来会列举一些典型需求的实现方案。</p>
+<ol>
+<li><p>数据集成</p>
+<p> 进行税务申报时，部分数据来源于数据库或历史Excel文件当中，例如公司信息，纳税编号，这些一般都是固化的信息，因此在申报时，我们可以采用绑定默认值的方式直接将这部分信息绑定在单元格中，在这里就需要借助SpreadJS中数据绑定的方式来填充这些固定信息，免除人工填写的过程，简化申报流程。对于本年度工资总额、收入总额等数据，可以通过公式计算而来，在这里就需要借助SpreadJS中公式函数的能力。SpreadJS中公式的使用方式于Excel中使用方式一致，兼容Excel中450种以上的公式函数，满足场景的公式应用需求。</p>
+<p> 示例演示：</p>
+<p> <img src="001.gif"></p>
+</li>
+<li><p>数据验证</p>
+<p> 数据验证可以用来限制数据类型或用户输入单元格的值，强制填报人员按照规则填报工作表。在Excel中数据验证的使用方式可以参考将数据有效性应用于单元格，SpreadJS中UI行为添加数据验证与Excel一致，API层面可以参考数据验证与条件格式。</p>
+<p> 在税务申报系统中，用户在填写时，需要能实时显示并定位当前sheet中存在数据验证的单元格、通过验证的单元格数量、与未通过验证的单元格数量。税务申报时，当前可视区域并不一定能完全显示工作表中的所有数据验证，该功能可以快速定位不合法数据，降低税务申报的操作复杂度。</p>
+<p> 示例演示：</p>
+<p> <img src="002.gif"></p>
+</li>
+<li><p>数据来源分析</p>
+<p> 税务申报表中，存在部分数据是通过其它单元格计算而来的，也就是公式函数，如果单元格公式依赖当前sheet中的单元格，则UI表现上是比较直观的。但在税务申报中，往往会存在跨工作表（sheet）的单元格引用关系，这时单靠SpreadJS默认提供的UI展示很难满足用户快速获得单元格引用关系的需求。对于此，我们可以借助SpreadJS中的公式追踪来实现依赖关系的直观展示。</p>
+<p> 示例演示：</p>
+<p> <img src="003.gif"></p>
+</li>
+<li><p>按需加载</p>
+<p> Web端Excel文件展示不及本地Excel文件的展示，Excel可以直接打开特别大的文件，但Web端不可以。因为Web端系统的运行环境依托于浏览器，以Chrome为例，64位操作系统的浏览器内存极限为1.4GB，因此并不是所有的大文件都可以直接在浏览器中直接打开展示。</p>
+<p> 对于一些大文件，我们可以采用在服务端对文件进行预处理，先解析当前文件中包含几个工作表，每个工作表中的公式函数是否依赖其它工作表。当然，在某种最坏的情况下，当前展示的工作表可能会依赖工作簿中的所有工作表，在这种情况下，这种按需分Sheet页加载就没有什么作用了。但是在税务申报计算时，一般是排在后边的表会依赖排在前边的工作表，我们可以先加载一些排在前边的工作表，后续通过sheet的切换来加载后续的表。</p>
+<p> 实现这一需求，需要配合服务端GCExcel。GCExcel是一款服务端处理Excel文件的控件，提供java及.net平台的资源包，对于大文件，可以提前在服务端做好文件的解析。</p>
+<p> 示例演示：</p>
+<p> <img src="004.gif"></p>
+</li>
+<li><p>税务申报表生成</p>
+<p> 税务申报表的结果由多张工作底稿计算而来，但是实际向税务局提交时，并不需要工作底稿，只需要一张有计算结果的申报表即可。这就需要我们在提交时，删除工作底稿，并且只保留申报表中的计算结果。</p>
+<p> SpreadJS提供了删除工作表及清除公式的相关API，使用这两个API就可以实现这一需求。</p>
+<p> 示例演示：</p>
+<p> <img src="005.gif"></p>
+</li>
+</ol>
+
+
+                <hr>
+
+                
+
+                <ul class="pager">
+                    
+                        <li class="previous">
+                            <a href="/2022/11/28/fc-Scenario-of-Financial-Industry-Indicator-Supplementation/" data-toggle="tooltip" data-placement="top" title="【公开课】金融行业指标补录场景分析与解决方案">&larr; Previous Post</a>
+                        </li>
+                    
+                    
+                        <li class="next">
+                            <a href="/2022/10/08/tech-use-sparse-table-to-conserve-memory-usage/" data-toggle="tooltip" data-placement="top" title="利用稀疏矩阵节省内存占用">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                
+
+                
+
+            </div>
+    <!-- Side Catalog Container -->
+        
+
+    <!-- Sidebar Container -->
+
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#Solutions" title="Solutions">Solutions</a>
+                        
+                          <a class="tag" href="/tags/#Analysis" title="Analysis">Analysis</a>
+                        
+                          <a class="tag" href="/tags/#Business" title="Business">Business</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+            </div>
+
+        </div>
+    </div>
+</article>
+
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'always',
+          placement: 'right',
+          icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://www.linkedin.com/in/kevin-chenkaihua">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://github.com/Gameckh">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://www.instagram.com/kevin.chenkh">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-instagram fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; KevinChen&#39;s Blog 2023
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+
+<script src="/js/jquery.min.js"></script>
+
+
+<!-- Bootstrap Core JavaScript -->
+
+<script src="/js/bootstrap.min.js"></script>
+
+
+<!-- Custom Theme JavaScript -->
+
+<script src="/js/hux-blog.min.js"></script>
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("https://gameckh.github.io/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+
+
+<!-- Baidu Tongji -->
+
+
+<!-- Side Catalog -->
+
+
+<div id="totop" style="position:fixed;bottom:50px;right:30px;">
+  <a title="返回顶部"><img style="cursor: pointer;" src="/img/scrollup.png"/></a>
+</div>
+
+<script src="/js/totop.js"></script>
+
+
+
+<!-- Image to hack wechat -->
+<img src="https://gameckh.github.io/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

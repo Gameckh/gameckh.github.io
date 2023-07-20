@@ -13,7 +13,7 @@
 
     <title>
         
-          MutationObserver实现自定义公式提示信息 - KevinChen&#39;s Blog
+          MutationObserver 实现自定义公式提示信息 - KevinChen&#39;s Blog
         
     </title>
 
@@ -96,13 +96,6 @@
 
                         
                         <li>
-                            <a href="/tags/">Tags</a>
-                        </li>
-                        
-                    
-
-                        
-                        <li>
                             <a href="/about/">About My Blog</a>
                         </li>
                         
@@ -111,6 +104,13 @@
                         
                         <li>
                             <a href="/archives/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
                         </li>
                         
                     
@@ -171,11 +171,15 @@
                 <div class="post-heading">
                     <div class="tags">
                         
-                          <a class="tag" href="/tags/#SpreadJS" title="SpreadJS">SpreadJS</a>
+                          <a class="tag" href="/tags/#MutationObserver" title="MutationObserver">MutationObserver</a>
+                        
+                          <a class="tag" href="/tags/#Formula Prompt" title="Formula Prompt">Formula Prompt</a>
+                        
+                          <a class="tag" href="/tags/#Customization" title="Customization">Customization</a>
                         
                     </div>
-                    <h1>MutationObserver实现自定义公式提示信息</h1>
-                    <h2 class="subheading">———— MutationObserver非主流应用场景</h2>
+                    <h1>MutationObserver 实现自定义公式提示信息</h1>
+                    <h2 class="subheading">Implementing Formula Prompt Messages Customization with MutationObserver</h2>
                     <span class="meta">
                         Posted by Kevin on
                         2020-12-28
@@ -199,6 +203,9 @@
 
                 <blockquote>
 <p>上周接到一个重要客户的个性化定制需求，要重写SpreadJS的公式提示信息面板。这个可以理解，打造自己的产品嘛，总是希望能加一些个性化的设计。</p>
+</blockquote>
+<blockquote>
+<p>Origin: <a target="_blank" rel="noopener" href="https://gcdn.grapecity.com.cn/showtopic-85303-1-1.html">https://gcdn.grapecity.com.cn/showtopic-85303-1-1.html</a></p>
 </blockquote>
 <p><strong>需求背景描述：</strong><br>上周接到一个重要客户的个性化定制需求，要重写SpreadJS的公式提示信息面板。客户是做在线协同文档产品的（对协同的话题感兴趣的话可以查看“协同文档”标签下的文章）。这个可以理解，打造自己的产品嘛，总是希望能加一些个性化的设计。但麻烦点在于，<strong>SpreadJS没有提供对应的public接口</strong>，所以通常会给客户建议直接购买SpreadJS的源代码，这样大家都愉快。<br>购买源码涉及到采购立项、商务谈判（搞不好还要招投标）、合同审核、付款等流程，这一套下来对方产品团队估计就疯了。这边经过讨论（尤其是要征得销售同学的同意，你猜猜为什么;) ），仅就此功能给客户出一个临时解决方案。<br>以上为背景。</p>
 <p><strong>需求/功能描述：</strong><br><img src="001.png"><br><img src="002.png"><br>如上图所示，以上两个提示信息是SpreadJS原生实现的，体验上类似Excel的Formula Helper的tip，客户就想自己做一个个性化的tip替换掉原生效果。<br>那么要实现自定制Formula Helper Tips，到底要实现什么？这里建议有此想法的小伙伴，可以先打开一个SpreadJS，输入公式后仔细查看Tips的UI逻辑。我总结了几点，如下所示：<br>1、能够在光标处根据当前输入内容，自动模糊检索可能的公式条目；<br>2、当输入公式参数时，会自动判断参数输入的是公式，还是值（或引用），如果是公式，回到1，如果是值（或引用），弹出参数提示以及公式详情；<br>3、当遇到多层嵌套公式时，Helper Tip会随鼠标点击（光标停留）的位置判断所在位置的公式，并结合1、2的逻辑给出对应的提示信息。<br>以上3点，是基于UI层面的逻辑拆解，看起来不复杂，但进一步拆解为技术点时会发现，里面有很多难点，比如：<br>1、怎么获得输入框的光标位置？<br>2、当光标更改时，如何拆解出对应的公式，并修改Tip的内容给出对应的提示？<br>3、怎么判断输入、点击、光标变更的事件，如何在合适的时机弹出Helper Tips？<br>这几个问题都是大坑，我会把这个话题分三个部分，把这些问题一一处理掉。</p>
@@ -229,7 +236,7 @@
                 <ul class="pager">
                     
                         <li class="previous">
-                            <a href="/2021/02/02/spjs-collaboration-system-architecture/" data-toggle="tooltip" data-placement="top" title="协同文档实现的流程、架构图以及相关解释">&larr; Previous Post</a>
+                            <a href="/2021/01/13/fc-Performance-Optimization-of-SpreadJS/" data-toggle="tooltip" data-placement="top" title="【公开课】SpreadJS 性能优化">&larr; Previous Post</a>
                         </li>
                     
                     
@@ -261,7 +268,11 @@
                     <h5><a href="/tags/">FEATURED TAGS</a></h5>
                     <div class="tags">
                        
-                          <a class="tag" href="/tags/#SpreadJS" title="SpreadJS">SpreadJS</a>
+                          <a class="tag" href="/tags/#MutationObserver" title="MutationObserver">MutationObserver</a>
+                        
+                          <a class="tag" href="/tags/#Formula Prompt" title="Formula Prompt">Formula Prompt</a>
+                        
+                          <a class="tag" href="/tags/#Customization" title="Customization">Customization</a>
                         
                     </div>
                 </section>
@@ -333,13 +344,33 @@
                 
 
                 
-
-                
                     <li>
                         <a target="_blank"  href="https://www.linkedin.com/in/kevin-chenkaihua">
                             <span class="fa-stack fa-lg">
                                 <i class="fa fa-circle fa-stack-2x"></i>
                                 <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://github.com/Gameckh">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://www.instagram.com/kevin.chenkh">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-instagram fa-stack-1x fa-inverse"></i>
                             </span>
                         </a>
                     </li>
