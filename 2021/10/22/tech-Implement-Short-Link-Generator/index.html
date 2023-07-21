@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword"  content="">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+          How to Implement a Short Link Generator for Your Application - KevinChen&#39;s Blog
+        
+    </title>
+
+    <link rel="canonical" href="https://gameckh.github.io/2021/10/22/tech-Implement-Short-Link-Generator/">
+
+    <!-- Bootstrap Core CSS -->
+    
+<link rel="stylesheet" href="/css/bootstrap.min.css">
+
+
+    <!-- Custom CSS -->
+    
+<link rel="stylesheet" href="/css/hux-blog.min.css">
+
+
+    <!-- Pygments Highlight CSS -->
+    
+<link rel="stylesheet" href="/css/highlight.css">
+
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">KevinChen&#39;s Blog</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About My Blog</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archives/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    
+<!-- Image to hack wechat -->
+<!-- <img src="https://gameckh.github.io/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="{{ site.baseurl }}/{% if page.header-img %}{{ page.header-img }}{% else %}{{ site.header-img }}{% endif %}" width="0" height="0"> -->
+
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        background-image: url('post-bg.jpg')
+    }
+</style>
+<header class="intro-header" >
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                          <a class="tag" href="/tags/#NodeJS" title="NodeJS">NodeJS</a>
+                        
+                          <a class="tag" href="/tags/#Mongodb" title="Mongodb">Mongodb</a>
+                        
+                          <a class="tag" href="/tags/#Short Link Generator" title="Short Link Generator">Short Link Generator</a>
+                        
+                    </div>
+                    <h1>How to Implement a Short Link Generator for Your Application</h1>
+                    <h2 class="subheading">Using Node &amp; Mongodb in 3 steps with high efficiency</h2>
+                    <span class="meta">
+                        Posted by Kevin on
+                        2021-10-22
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <blockquote>
+<p>In practical web applications, scenarios often arise where there is a need to generate QR codes from web authorization authentication addresses. If the URL length is overly long, the resulting QR code’s density becomes too great, leading to difficulties in recognition by the camera.<br>I was invited to compose this piece to share how I addressed this issue. This article is published under the name of the ‘GrapeCity Technical Team’ on the CNBlogs, with the original address as follows: <a target="_blank" rel="noopener" href="https://www.cnblogs.com/powertoolsteam/p/shorturlgenerator.html">https://www.cnblogs.com/powertoolsteam/p/shorturlgenerator.html</a></p>
+</blockquote>
+<p>In such instances, it naturally comes to mind to use a short link to reduce the characters in the URL, making the generated code easier to recognize, while also making the URL more aesthetically pleasing and easier to share. </p>
+<p>Currently available on the market are Weibo’s t.cn and some third-party short link generation tools. However, both types of tools have some usage issues. For example, the current rule for t.cn is that a redirect page will appear and it will not directly redirect. As for third-party tools, since they operate on a public platform, they may become inaccessible due to the presence of inappropriate content.</p>
+<p>Given these circumstances, it might be better to implement our own short link platform. The principle behind creating a short link platform is relatively straightforward and can be accomplished in two parts: 1. Preserving the correspondence between long and short links, and 2. Redirecting by querying the long link through the short link.</p>
+<p>For efficiency, I used Node.js and MongoDB for this task. Now, let’s get started.</p>
+<p>First, we need to create an Express project.</p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">express -e demo</span><br><span class="line"></span><br><span class="line">change directory:</span><br><span class="line">    &gt; <span class="built_in">cd</span> demo</span><br><span class="line"></span><br><span class="line">install dependencies:</span><br><span class="line">    &gt; npm install</span><br><span class="line"></span><br><span class="line">run the app:</span><br><span class="line">    &gt; <span class="built_in">SET</span> DEBUG=demo:* &amp; npm <span class="built_in">start</span></span><br></pre></td></tr></table></figure>
+
+<p>Then, import to the demo directory and install the necessary Express dependencies.</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm <span class="keyword">install</span></span><br></pre></td></tr></table></figure>
+
+<p>Simultaneously, use npm to install the mongoose, shortid and body-parser packages that we will be needing.</p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">npm <span class="keyword">install </span>mongoose</span><br><span class="line">npm <span class="keyword">install </span><span class="keyword">shortid</span></span><br><span class="line"><span class="keyword"></span>npm <span class="keyword">install </span><span class="keyword">body-parser</span></span><br></pre></td></tr></table></figure>
+<p>Let’s briefly explain the use of these three packages:</p>
+<ul>
+<li><p>In this application, we used MongoDB. We chose it because it operates efficiently with low overhead, so it also runs efficiently. However, using other databases would work as well. Here, mongoose is a package from npm, primarily providing the application with functionalities to connect to MongoDB and perform create, read, update, and delete operations.</p>
+</li>
+<li><p>By using shortid, we can generate a unique, non-repetitive encoding, which helps us generate encodings similar to the red part in xxx.com/ngTsfdgh.</p>
+</li>
+<li><p>As the API for generating our short link uses the POST method, the use of body-parser extends our ability to parse one more type of body encoding.</p>
+</li>
+</ul>
+<h3 id="First-set-up-the-connection-information-for-MongoDB"><a href="#First-set-up-the-connection-information-for-MongoDB" class="headerlink" title="First, set up the connection information for MongoDB."></a>First, set up the connection information for MongoDB.</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">    <span class="attr">mongo_base_connection_url</span>: <span class="string">&#x27;mongodb://localhost:27017&#x27;</span>,</span><br><span class="line">    <span class="attr">mongo_db</span>: <span class="string">&#x27;mongodb://localhost:27017/shorturl&#x27;</span>,</span><br><span class="line">    <span class="attr">mongo_options</span>: &#123;</span><br><span class="line">        <span class="attr">autoReconnect</span>: <span class="literal">true</span>,</span><br><span class="line">        <span class="attr">keepAlive</span>: <span class="literal">true</span>,</span><br><span class="line">        <span class="attr">reconnectTries</span>: <span class="number">50</span>,</span><br><span class="line">        <span class="attr">reconnectInterval</span>: <span class="number">1000</span>,</span><br><span class="line">        <span class="attr">connectTimeoutMS</span>: <span class="number">5000000</span>,</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">&quot;Connection local mongo db&quot;</span>);</span><br></pre></td></tr></table></figure>
+<h3 id="Database-Model-Definition"><a href="#Database-Model-Definition" class="headerlink" title="Database Model Definition"></a>Database Model Definition</h3><p>Since our correspondence needs to query the long link through the short link, our main focus here is storing the short link and long link. Additionally, you can also add fields such as link click counts based on your needs for future statistics.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> mongoose = <span class="built_in">require</span>(<span class="string">&#x27;mongoose&#x27;</span>);</span><br><span class="line"><span class="keyword">var</span> Schema = mongoose.Schema;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">var</span> urlSchema = <span class="keyword">new</span> Schema(&#123;</span><br><span class="line">  <span class="attr">shortUrl</span>: <span class="built_in">String</span>,</span><br><span class="line">  <span class="attr">longUrl</span>: <span class="built_in">String</span></span><br><span class="line">&#125;);</span><br><span class="line"> </span><br><span class="line"><span class="built_in">module</span>.exports = mongoose.model(<span class="string">&#x27;UrlTable&#x27;</span>, urlSchema);</span><br></pre></td></tr></table></figure>
+
+<h3 id="Defining-Express-Routes"><a href="#Defining-Express-Routes" class="headerlink" title="Defining Express Routes"></a>Defining Express Routes</h3><p>Since our application only has the generation and redirection functionalities, all our work can be accomplished with just two pages.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> index = <span class="built_in">require</span>(<span class="string">&#x27;./routes/index&#x27;</span>);</span><br><span class="line"><span class="keyword">var</span> url = <span class="built_in">require</span>(<span class="string">&#x27;./routes/url&#x27;</span>);</span><br><span class="line">app.use(<span class="string">&#x27;/&#x27;</span>, index);</span><br><span class="line">app.use(<span class="string">&#x27;/url&#x27;</span>, url);</span><br></pre></td></tr></table></figure>
+
+<h3 id="Short-Link-Generation-Page"><a href="#Short-Link-Generation-Page" class="headerlink" title="Short Link Generation Page"></a>Short Link Generation Page</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> express = <span class="built_in">require</span>(<span class="string">&quot;express&quot;</span>);</span><br><span class="line"><span class="keyword">const</span> router = express.Router();</span><br><span class="line"><span class="keyword">const</span> shortId = <span class="built_in">require</span>(<span class="string">&#x27;shortid&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> UrlTable = <span class="built_in">require</span>(<span class="string">&#x27;../models/urltable&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> mongoose = <span class="built_in">require</span>(<span class="string">&#x27;mongoose&#x27;</span>);</span><br><span class="line"><span class="keyword">var</span> setup = <span class="built_in">require</span>(<span class="string">&#x27;../dbconfig/db&#x27;</span>);</span><br><span class="line"> </span><br><span class="line">router.post(<span class="string">&#x27;/&#x27;</span>, <span class="function"><span class="keyword">function</span>(<span class="params">req, res, next</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> params = req.body;</span><br><span class="line">    <span class="keyword">var</span> url = params.longUrl;</span><br><span class="line">shortId.characters(<span class="string">&#x27; 0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ^*&#x27;</span>)</span><br><span class="line">    <span class="keyword">var</span> shortid = shortId.generate();</span><br><span class="line">    <span class="keyword">var</span> objurl = &#123; <span class="attr">shortUrl</span>: shortid, <span class="attr">longUrl</span>: url&#125;;</span><br><span class="line">    mongoose.connect(setup.mongo_db, setup.mongo_options);</span><br><span class="line">    UrlTable.create(objurl, <span class="function"><span class="keyword">function</span> (<span class="params">err, objurl</span>) </span>&#123;</span><br><span class="line">      <span class="comment">//if (err) console.log(err);</span></span><br><span class="line">      res.send(<span class="string">&quot;http://localhost:3000/&quot;</span> + shortid);</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h3 id="Specify-the-range-for-generating-the-shortId-character-and-generate-it"><a href="#Specify-the-range-for-generating-the-shortId-character-and-generate-it" class="headerlink" title="Specify the range for generating the shortId character and generate it:"></a>Specify the range for generating the shortId character and generate it:</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">shortId.characters(<span class="string">&#x27;0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&#x27;</span>)</span><br><span class="line"><span class="keyword">var</span> shortid = shortId.generate();</span><br></pre></td></tr></table></figure>
+
+<h3 id="Construct-a-data-model-that-meets-requirements-for-the-database"><a href="#Construct-a-data-model-that-meets-requirements-for-the-database" class="headerlink" title="Construct a data model that meets requirements for the database:"></a>Construct a data model that meets requirements for the database:</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> objurl = &#123; <span class="attr">shortUrl</span>: shortid, <span class="attr">longUrl</span>: url&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Finally-connect-to-the-database-save-it-and-return-the-short-link-result-to-the-client"><a href="#Finally-connect-to-the-database-save-it-and-return-the-short-link-result-to-the-client" class="headerlink" title="Finally, connect to the database, save it, and return the short link result to the client:"></a>Finally, connect to the database, save it, and return the short link result to the client:</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">mongoose.connect(setup.mongo_db, setup.mongo_options);</span><br><span class="line">UrlTable.create(objurl, <span class="function"><span class="keyword">function</span> (<span class="params">err, objurl</span>) </span>&#123;</span><br><span class="line">    <span class="comment">//if (err) console.log(err);</span></span><br><span class="line">    res.send(<span class="string">&quot;http://localhost:3000/&quot;</span> + shortid);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h3 id="Short-Link-Redirection-Page"><a href="#Short-Link-Redirection-Page" class="headerlink" title="Short Link Redirection Page"></a>Short Link Redirection Page</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> express = <span class="built_in">require</span>(<span class="string">&quot;express&quot;</span>);</span><br><span class="line"><span class="keyword">const</span> router = express.Router();</span><br><span class="line"><span class="keyword">const</span> UrlTable = <span class="built_in">require</span>(<span class="string">&#x27;../models/urltable&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> mongoose = <span class="built_in">require</span>(<span class="string">&#x27;mongoose&#x27;</span>);</span><br><span class="line"><span class="keyword">var</span> setup = <span class="built_in">require</span>(<span class="string">&#x27;../dbconfig/db&#x27;</span>);</span><br><span class="line"> </span><br><span class="line">router.get(<span class="string">&#x27;/:shortUrl&#x27;</span>, <span class="function"><span class="keyword">function</span> (<span class="params">req, res, next</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> shortUrl = req.params.shortUrl;</span><br><span class="line">    mongoose.connect(setup.mongo_db, setup.mongo_options);</span><br><span class="line">    UrlTable.findOne(&#123; <span class="attr">shortUrl</span>:shortUrl &#125;).then(<span class="function">(<span class="params">result</span>) =&gt;</span> &#123;</span><br><span class="line">       <span class="comment">//待添加错误处理</span></span><br><span class="line">    res.redirect(result.longUrl);</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;);</span><br><span class="line"> </span><br><span class="line"><span class="built_in">module</span>.exports = router;</span><br></pre></td></tr></table></figure>
+
+<p>For this page, to facilitate quick redirection, we use GET to receive parameters. The functionality of this page is quite straightforward - receive parameters, query, and redirect.</p>
+<h3 id="Receiving-the-short-link-code"><a href="#Receiving-the-short-link-code" class="headerlink" title="Receiving the short link code"></a>Receiving the short link code</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> shortUrl = req.params.shortUrl;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Connect-to-the-database-query-and-redirect"><a href="#Connect-to-the-database-query-and-redirect" class="headerlink" title="Connect to the database, query, and redirect."></a>Connect to the database, query, and redirect.</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mongoose.connect(setup.mongo_db, setup.mongo_options);</span><br><span class="line">UrlTable.findOne(&#123; <span class="attr">shortUrl</span>:shortUrl &#125;).then(<span class="function">(<span class="params">result</span>) =&gt;</span> &#123;</span><br><span class="line">    res.redirect(result.longUrl);</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>Later on, you can enhance the application by handling errors and exceptions, along with data statistics. I won’t go into detail about that here.</p>
+<p>Now, let’s enable the application and start testing.</p>
+<h3 id="Launching-the-application-and-testing"><a href="#Launching-the-application-and-testing" class="headerlink" title="Launching the application and testing"></a>Launching the application and testing</h3><figure class="highlight coffeescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">npm</span> start</span><br></pre></td></tr></table></figure>
+
+<p>After launching, the default access port is 3000. We will first test the short link generation page. Here, we POST a long link parameter named ‘longUrl’. The data object is:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="attr">&quot;longUrl&quot;</span> : <span class="string">&quot;https://demo.grapecity.com.cn/spreadjs/SpreadJSTutorial/features/tables/basic-table/purejs&quot;</span>&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="001.gif"></p>
+<p>A short link as follows has been successfully generated:</p>
+<p><a target="_blank" rel="noopener" href="http://localhost:3000/iGE6ZlDmh">http://localhost:3000/iGE6ZlDmh</a></p>
+<p>As long as we can properly redirect to the saved long link by accessing the short link, it’s fine.</p>
+<p><img src="002.gif"></p>
+<p>The test passed. Actually, the amount of code isn’t large and the principle is quite simple. If you have a shorter domain name, the link will become even shorter and more aesthetically pleasing after going live.<br>Thus, we have completed the development of our own short link generation platform. The source code is attached below. By running npm install, all dependencies will be automatically installed. </p>
+<p><a href="shorturl.zip">Click here to download source code</a></p>
+
+
+                <hr>
+
+                
+
+                <ul class="pager">
+                    
+                        <li class="previous">
+                            <a href="/2022/07/12/research-report-version-control-of-spreadsheets/" data-toggle="tooltip" data-placement="top" title="调研报告：表格文档版本管理">&larr; Previous Post</a>
+                        </li>
+                    
+                    
+                        <li class="next">
+                            <a href="/2021/09/16/tech-Experiencing-React-Concurrent-Features/" data-toggle="tooltip" data-placement="top" title="Experiencing React's Concurrent Features">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                
+
+                
+
+            </div>
+    <!-- Side Catalog Container -->
+        
+
+    <!-- Sidebar Container -->
+
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#NodeJS" title="NodeJS">NodeJS</a>
+                        
+                          <a class="tag" href="/tags/#Mongodb" title="Mongodb">Mongodb</a>
+                        
+                          <a class="tag" href="/tags/#Short Link Generator" title="Short Link Generator">Short Link Generator</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+            </div>
+
+        </div>
+    </div>
+</article>
+
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'always',
+          placement: 'right',
+          icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://www.linkedin.com/in/kevin-chenkaihua">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://github.com/Gameckh">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://www.instagram.com/kevin.chenkh">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-instagram fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; KevinChen&#39;s Blog 2023
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+
+<script src="/js/jquery.min.js"></script>
+
+
+<!-- Bootstrap Core JavaScript -->
+
+<script src="/js/bootstrap.min.js"></script>
+
+
+<!-- Custom Theme JavaScript -->
+
+<script src="/js/hux-blog.min.js"></script>
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("https://gameckh.github.io/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+
+
+<!-- Baidu Tongji -->
+
+
+<!-- Side Catalog -->
+
+
+<div id="totop" style="position:fixed;bottom:50px;right:30px;">
+  <a title="返回顶部"><img style="cursor: pointer;" src="/img/scrollup.png"/></a>
+</div>
+
+<script src="/js/totop.js"></script>
+
+
+
+<!-- Image to hack wechat -->
+<img src="https://gameckh.github.io/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

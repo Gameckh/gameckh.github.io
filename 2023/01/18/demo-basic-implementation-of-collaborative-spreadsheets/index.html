@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword"  content="">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+          [Demo] Basic Implementation of Collaborative Spreadsheets - KevinChen&#39;s Blog
+        
+    </title>
+
+    <link rel="canonical" href="https://gameckh.github.io/2023/01/18/demo-basic-implementation-of-collaborative-spreadsheets/">
+
+    <!-- Bootstrap Core CSS -->
+    
+<link rel="stylesheet" href="/css/bootstrap.min.css">
+
+
+    <!-- Custom CSS -->
+    
+<link rel="stylesheet" href="/css/hux-blog.min.css">
+
+
+    <!-- Pygments Highlight CSS -->
+    
+<link rel="stylesheet" href="/css/highlight.css">
+
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">KevinChen&#39;s Blog</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About My Blog</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archives/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    
+<!-- Image to hack wechat -->
+<!-- <img src="https://gameckh.github.io/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="{{ site.baseurl }}/{% if page.header-img %}{{ page.header-img }}{% else %}{{ site.header-img }}{% endif %}" width="0" height="0"> -->
+
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        background-image: url('post-bg.jpg')
+    }
+</style>
+<header class="intro-header" >
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                          <a class="tag" href="/tags/#collaborative documents" title="collaborative documents">collaborative documents</a>
+                        
+                          <a class="tag" href="/tags/#React" title="React">React</a>
+                        
+                          <a class="tag" href="/tags/#SpringBoot" title="SpringBoot">SpringBoot</a>
+                        
+                          <a class="tag" href="/tags/#SpreadJS" title="SpreadJS">SpreadJS</a>
+                        
+                          <a class="tag" href="/tags/#GcExcel" title="GcExcel">GcExcel</a>
+                        
+                          <a class="tag" href="/tags/#WebSocket" title="WebSocket">WebSocket</a>
+                        
+                    </div>
+                    <h1>[Demo] Basic Implementation of Collaborative Spreadsheets</h1>
+                    <h2 class="subheading">How to implement the collaborative actions, command synchronization, and finely-grained data interaction with React, SpringBoot, WebSocket and SpreadJS</h2>
+                    <span class="meta">
+                        Posted by Kevin on
+                        2023-01-18
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <blockquote>
+<p>For the complete project files, refer to my GitHub: <a target="_blank" rel="noopener" href="https://github.com/Gameckh/CollaborativeDemo_FrontEnd">https://github.com/Gameckh/CollaborativeDemo_FrontEnd</a></p>
+</blockquote>
+<h3 id="Background-Info"><a href="#Background-Info" class="headerlink" title="Background Info"></a>Background Info</h3><p>Collaborative editing of spreadsheets is one of the more advanced application scenarios in spreadsheet technology, and it has attracted numerous inquiries during the pandemic. The purpose of developing this demo is to provide a straightforward illustration of the implementation strategy for collaborative spreadsheets.</p>
+<p>The demo merely exemplifies the capture of collaborative actions, command synchronization, and finely-grained data interaction. Genuine collaborative applications are significantly more intricate, necessitating solutions for complex issues such as permission control, data conflicts, and version management. Concurrently, it is also essential to address the bottleneck issue of concurrent performance (as collaborative applications are typically high-consistency applications, optimizing concurrent performance becomes a captivating topic of discussion).</p>
+<p>This tutorial will utilize a straightforward framework to elucidate the roles of SpreadJS and GCExcel in the entire collaborative editing scenario. The front-end relies on React, the back-end is based on SpringBoot, and data interaction is facilitated via WebSocket.</p>
+<p>This project pertains to the front-end part. For the back-end part, please refer to:<br><a target="_blank" rel="noopener" href="https://github.com/Gameckh/CollaborativeDemo_BackEnd">CollaborativeDemo_BackEnd</a></p>
+<h3 id="Environment-Setup"><a href="#Environment-Setup" class="headerlink" title="Environment Setup"></a>Environment Setup</h3><ol>
+<li><p><strong>Creating Front-End Project</strong></p>
+<p> Introducing SpreadJS dependencies: Beginning with @grapecity/spread.</p>
+<p> <a target="_blank" rel="noopener" href="https://github.com/Gameckh/CollaborativeDemo_FrontEnd/blob/master/package.json">package.json</a></p>
+ <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&quot;devDependencies&quot;</span>: &#123;</span><br><span class="line">  <span class="attr">&quot;ajv&quot;</span>: <span class="string">&quot;^6.9.1&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;cross-env&quot;</span>: <span class="string">&quot;^5.2.0&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;typescript&quot;</span>: <span class="string">&quot;^3.7.5&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;eslint&quot;</span>: <span class="string">&quot;^6.8.0&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;eslint-config-react-app&quot;</span>: <span class="string">&quot;^5.2.0&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;eslint-plugin-flowtype&quot;</span>: <span class="string">&quot;^4.6.0&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;eslint-plugin-import&quot;</span>: <span class="string">&quot;^2.20.1&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;eslint-plugin-jsx-a11y&quot;</span>: <span class="string">&quot;^6.2.3&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;eslint-plugin-react&quot;</span>: <span class="string">&quot;^7.18.3&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;@grapecity/spread-excelio&quot;</span>: <span class="string">&quot;14.0.0&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;@grapecity/spread-sheets&quot;</span>: <span class="string">&quot;14.0.0&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;@grapecity/spread-sheets-barcode&quot;</span>: <span class="string">&quot;14.0.0&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;@grapecity/spread-sheets-charts&quot;</span>: <span class="string">&quot;14.0.0&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;@grapecity/spread-sheets-languagepackages&quot;</span>: <span class="string">&quot;14.0.0&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;@grapecity/spread-sheets-pdf&quot;</span>: <span class="string">&quot;14.0.0&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;@grapecity/spread-sheets-print&quot;</span>: <span class="string">&quot;14.0.0&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;@grapecity/spread-sheets-react&quot;</span>: <span class="string">&quot;14.0.0&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;@grapecity/spread-sheets-resources-zh&quot;</span>: <span class="string">&quot;14.0.0&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;@grapecity/spread-sheets-shapes&quot;</span>: <span class="string">&quot;14.0.0&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;@grapecity/spread-sheets-pivots&quot;</span>: <span class="string">&quot;14.0.0&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;@grapecity/spread-sheets-designer&quot;</span>: <span class="string">&quot;14.0.0&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;@grapecity/spread-sheets-designer-react&quot;</span>: <span class="string">&quot;14.0.0&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;@grapecity/spread-sheets-designer-resources-cn&quot;</span>: <span class="string">&quot;14.0.0&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p> Integrating the ‘Online Spreadsheet Editor’ Component Version</p>
+<p> <a target="_blank" rel="noopener" href="https://github.com/Gameckh/CollaborativeDemo_FrontEnd/blob/master/src/components/Spreadsheet.js">Spreadsheet.js</a></p>
+ <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="title">render</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">  <span class="keyword">return</span> (</span><br><span class="line">    <span class="xml"><span class="tag">&lt;<span class="name">Designer</span> <span class="attr">styleInfo</span>=<span class="string">&#123;&#123;</span> <span class="attr">width:</span> &quot;<span class="attr">100</span>%&quot;, <span class="attr">height:</span> &#x27;<span class="attr">90vh</span>&#x27; &#125;&#125; <span class="attr">designerInitialized</span>=<span class="string">&#123;designer</span> =&gt;</span> &#123; this.getDesigner(designer) &#125;&#125; &gt;<span class="tag">&lt;/<span class="name">Designer</span>&gt;</span></span></span><br><span class="line">  );</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="title">getDesigner</span>(<span class="params">designer</span>)</span> &#123;</span><br><span class="line">  <span class="built_in">this</span>.designer = designer;</span><br><span class="line">  <span class="built_in">this</span>.spread = designer.getWorkbook();</span><br><span class="line">  <span class="keyword">var</span> cm = <span class="built_in">this</span>.spread.commandManager();</span><br><span class="line"></span><br><span class="line">  cm.addListener(<span class="string">&#x27;myListener&#x27;</span>, <span class="built_in">this</span>.onCommandExecute)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p> With this, the front-end preparation is duly completed.</p>
+</li>
+<li><p><strong>Back-End Environment Setup</strong></p>
+<p> For the back-end preparations, the initial step involves installing Gradle as the package manager. Of course, other tools can be used as substitutes here, such as Maven, or the native method of introducing required jar packages.</p>
+<p> Subsequently, create a SpringBoot project in conjunction with setting up Gradle to reference GCExcel and the WebSocket required for later collaboration.</p>
+<p> <a target="_blank" rel="noopener" href="https://github.com/Gameckh/CollaborativeDemo_BackEnd/blob/master/build.gradle">build.gradle</a></p>
+ <figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">dependencies</span> &#123;</span><br><span class="line">    <span class="keyword">compile</span>(<span class="string">&quot;org.springframework.boot:spring-boot-starter-web&quot;</span>)</span><br><span class="line">    <span class="keyword">compile</span>(<span class="string">&quot;org.apache.tomcat.embed:tomcat-embed-jasper&quot;</span>)</span><br><span class="line">    <span class="keyword">compile</span>(<span class="string">&quot;javax.servlet:jstl&quot;</span>)</span><br><span class="line">    <span class="keyword">compile</span> <span class="keyword">group</span>: <span class="string">&#x27;com.google.code.gson&#x27;</span>, name: <span class="string">&#x27;gson&#x27;</span>, version: <span class="string">&#x27;2.8.5&#x27;</span></span><br><span class="line">    <span class="keyword">compile</span> <span class="keyword">fileTree</span>(dir: <span class="string">&#x27;libs&#x27;</span>, <span class="keyword">include</span>: [<span class="string">&#x27;*.jar&#x27;</span>])</span><br><span class="line">    providedRuntime <span class="string">&#x27;org.springframework.boot:spring-boot-starter-tomcat&#x27;</span></span><br><span class="line"></span><br><span class="line">    testCompile(<span class="string">&#x27;org.springframework.boot:spring-boot-starter-test&#x27;</span>)</span><br><span class="line">    testCompile(<span class="string">&#x27;com.jayway.jsonpath:json-path&#x27;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">compile</span>(<span class="string">&quot;com.grapecity.documents:gcexcel:3.2.2&quot;</span>)</span><br><span class="line">    <span class="keyword">compile</span>(<span class="string">&#x27;org.springframework.boot:spring-boot-starter-websocket&#x27;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="Core-Code"><a href="#Core-Code" class="headerlink" title="Core Code"></a>Core Code</h3><ol>
+<li><p><strong>Front-End</strong></p>
+<p> Given that collaboration is the objective, the first step would be setting up a WebSocket.</p>
+<p> In React, using WebSocket doesn’t necessitate the inclusion of other libraries, it merely requires the creation of a common component to encapsulate WebSocket:</p>
+<p> <a target="_blank" rel="noopener" href="https://github.com/Gameckh/CollaborativeDemo_FrontEnd/blob/master/src/components/Spreadsheet.js">Spreadsheet.js</a></p>
+ <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="title">connectDocument</span>(<span class="params">docName</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span>(<span class="built_in">this</span>.webSocket != <span class="literal">null</span>)&#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> self = <span class="built_in">this</span>;</span><br><span class="line">    <span class="keyword">var</span> ws = <span class="keyword">new</span> WebSocket(Utility.webSocketUrl);</span><br><span class="line">    ws.onopen = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> data = &#123;</span><br><span class="line">            <span class="attr">cmd</span>: <span class="string">&quot;connect&quot;</span>,</span><br><span class="line">            <span class="attr">docID</span>: docName</span><br><span class="line">        &#125;</span><br><span class="line">        ws.send(<span class="built_in">JSON</span>.stringify(data));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    ws.onmessage = <span class="built_in">this</span>.onmessage;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">this</span>.webSocket= ws;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> Next, we need to monitor the actions initiated by the front-end. Here, since the online spreadsheet editor has encapsulated all possible user actions, a great deal of effort is saved.</p>
+<p> <a target="_blank" rel="noopener" href="https://github.com/Gameckh/CollaborativeDemo_FrontEnd/blob/master/src/components/Spreadsheet.js">Spreadsheet.js</a></p>
+ <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="title">getDesigner</span>(<span class="params">designer</span>)</span> &#123;</span><br><span class="line">  <span class="built_in">this</span>.designer = designer;</span><br><span class="line">  <span class="built_in">this</span>.spread = designer.getWorkbook();</span><br><span class="line">  <span class="keyword">var</span> cm = <span class="built_in">this</span>.spread.commandManager();</span><br><span class="line"></span><br><span class="line">  cm.addListener(<span class="string">&#x27;myListener&#x27;</span>, <span class="built_in">this</span>.onCommandExecute)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> Determine based on the command and further encapsulate it in a simple manner.</p>
+<p> <a target="_blank" rel="noopener" href="https://github.com/Gameckh/CollaborativeDemo_FrontEnd/blob/master/src/components/Spreadsheet.js">Spreadsheet.js</a></p>
+ <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="title">onCommandExecute</span>(<span class="params">args</span>)</span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(args.command);</span><br><span class="line">  <span class="keyword">var</span> command = args.command;</span><br><span class="line">  <span class="keyword">var</span> ServerCommand = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">switch</span>(command.cmd)&#123;</span><br><span class="line">      <span class="keyword">case</span> Utility.ServerCommands.EditCell:</span><br><span class="line">          ServerCommand = &#123;</span><br><span class="line">              <span class="attr">sheetName</span>: command.sheetName,</span><br><span class="line">              <span class="attr">row</span>: command.row,</span><br><span class="line">              <span class="attr">column</span>: command.col,</span><br><span class="line">              <span class="attr">newValue</span>: command.newValue</span><br><span class="line">          &#125;</span><br><span class="line">          <span class="keyword">break</span>;</span><br><span class="line">      <span class="keyword">case</span> Utility.ServerCommands.ResizeRow:</span><br><span class="line">          ServerCommand = &#123;</span><br><span class="line">              <span class="attr">sheetName</span>: command.sheetName,</span><br><span class="line">              <span class="attr">rows</span>: command.rows,</span><br><span class="line">              <span class="attr">size</span>: command.size</span><br><span class="line">          &#125;;</span><br><span class="line">          <span class="keyword">break</span>;</span><br><span class="line">      <span class="keyword">case</span> Utility.ServerCommands.ResizeColumn:</span><br><span class="line">          ServerCommand = &#123;</span><br><span class="line">              <span class="attr">sheetName</span>: command.sheetName,</span><br><span class="line">              <span class="attr">columns</span>: command.columns,</span><br><span class="line">              <span class="attr">size</span>: command.size</span><br><span class="line">          &#125;;</span><br><span class="line">          <span class="keyword">break</span>;</span><br><span class="line">      <span class="keyword">case</span> <span class="string">&#x27;Designer.&#x27;</span> + Utility.ServerCommands.SetFontFamily:</span><br><span class="line">      <span class="keyword">case</span> <span class="string">&#x27;Designer.&#x27;</span> + Utility.ServerCommands.SetFontSize:</span><br><span class="line">      <span class="keyword">case</span> <span class="string">&#x27;Designer.&#x27;</span> + Utility.ServerCommands.SetBackColor:</span><br><span class="line">      <span class="keyword">case</span> <span class="string">&#x27;Designer.&#x27;</span> + Utility.ServerCommands.SetForeColor:</span><br><span class="line">      <span class="keyword">case</span> <span class="string">&#x27;Designer.&#x27;</span> + Utility.ServerCommands.SetFontWeight:</span><br><span class="line">      <span class="keyword">case</span> <span class="string">&#x27;Designer.&#x27;</span> + Utility.ServerCommands.SetFontStyle:</span><br><span class="line">      <span class="keyword">case</span> <span class="string">&#x27;Designer.&#x27;</span> + Utility.ServerCommands.SetUnderline:</span><br><span class="line">      <span class="keyword">case</span> <span class="string">&#x27;Designer.&#x27;</span> + Utility.ServerCommands.SetDoubleUnderline:</span><br><span class="line">          <span class="keyword">if</span>(command.value &amp;&amp; command.value.indexOf(<span class="string">&#x27;undefined&#x27;</span>) === -<span class="number">1</span>)&#123;</span><br><span class="line">              ServerCommand = &#123;</span><br><span class="line">                  <span class="attr">sheetName</span>: command.sheetName,</span><br><span class="line">                  <span class="attr">selections</span>: command.selections,</span><br><span class="line">                  <span class="attr">value</span>: command.value</span><br><span class="line">              &#125;</span><br><span class="line">          &#125;</span><br><span class="line">          <span class="keyword">break</span>;</span><br><span class="line">      <span class="keyword">case</span> Utility.ServerCommands.MoveFloatingObjects:</span><br><span class="line">          ServerCommand = &#123;</span><br><span class="line">              <span class="attr">sheetName</span>: command.sheetName,</span><br><span class="line">              <span class="attr">floatingObjects</span>: command.floatingObjects,</span><br><span class="line">              <span class="attr">offsetX</span>: command.offsetX,</span><br><span class="line">              <span class="attr">offsetY</span>: command.offsetY</span><br><span class="line">          &#125;;</span><br><span class="line">          <span class="keyword">break</span>;</span><br><span class="line">      <span class="keyword">case</span> Utility.ServerCommands.ResizeFloatingObjects:</span><br><span class="line">          ServerCommand = &#123;</span><br><span class="line">              <span class="attr">sheetName</span>: command.sheetName,</span><br><span class="line">              <span class="attr">floatingObjects</span>: command.floatingObjects,</span><br><span class="line">              <span class="attr">offsetX</span>: command.offsetX,</span><br><span class="line">              <span class="attr">offsetY</span>: command.offsetY,</span><br><span class="line">              <span class="attr">offsetWidth</span>: command.offsetWidth,</span><br><span class="line">              <span class="attr">offsetHeight</span>: command.offsetHeight</span><br><span class="line">          &#125;;</span><br><span class="line">          <span class="keyword">break</span>;  </span><br><span class="line">      <span class="keyword">case</span> Utility.ServerCommands.InsertColumns:</span><br><span class="line">      <span class="keyword">case</span> Utility.ServerCommands.InsertRows:</span><br><span class="line">          ServerCommand = &#123;</span><br><span class="line">              <span class="attr">sheetName</span>: command.sheetName,</span><br><span class="line">              <span class="attr">selections</span>: command.selections</span><br><span class="line">          &#125;;</span><br><span class="line">          <span class="keyword">break</span>;</span><br><span class="line">      <span class="keyword">default</span>:</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">if</span>(ServerCommand != <span class="literal">null</span>)&#123;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">var</span> cmd = command.cmd;</span><br><span class="line">      <span class="keyword">var</span> dotIndex = cmd.lastIndexOf(<span class="string">&#x27;.&#x27;</span>);</span><br><span class="line">      <span class="keyword">if</span>(dotIndex !== -<span class="number">1</span>)&#123;</span><br><span class="line">          cmd = cmd.substring(dotIndex + <span class="number">1</span>);</span><br><span class="line">      &#125;</span><br><span class="line">      ServerCommand.cmd = cmd;</span><br><span class="line">      ServerCommand.docID = <span class="built_in">this</span>.docName;</span><br><span class="line">      </span><br><span class="line">      Utility.ExecuteCommandAtServer(ServerCommand);</span><br><span class="line"></span><br><span class="line">      command.docID = ServerCommand.docID;</span><br><span class="line">      <span class="built_in">this</span>.webSocket.send(<span class="built_in">JSON</span>.stringify(command))</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> When the collaborative end receives a request through WebSocket, it synchronizes the command using the onmessage method.</p>
+<p> Before executing the command at the collaborative end, it is necessary to first revoke the previous listening to avoid re-sending WebSocket, which could lead to an infinite loop. After execution, the listening is added once again.</p>
+<p> <a target="_blank" rel="noopener" href="https://github.com/Gameckh/CollaborativeDemo_FrontEnd/blob/master/src/components/Spreadsheet.js">Spreadsheet.js</a></p>
+ <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="title">onmessage</span>(<span class="params">message</span>)</span>&#123;</span><br><span class="line">  <span class="keyword">var</span> command = <span class="built_in">JSON</span>.parse(message.data);</span><br><span class="line">  command._styles = <span class="literal">null</span>;</span><br><span class="line">      </span><br><span class="line">  <span class="keyword">var</span> cm = <span class="built_in">this</span>.spread.commandManager();</span><br><span class="line">  cm.removeListener(<span class="string">&#x27;myListener&#x27;</span>);</span><br><span class="line"></span><br><span class="line">  <span class="built_in">this</span>.spread.commandManager().execute(command);</span><br><span class="line"></span><br><span class="line">  cm.addListener(<span class="string">&#x27;myListener&#x27;</span>, <span class="built_in">this</span>.onCommandExecute);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p><strong>Back-End</strong></p>
+<p> Firstly, set up the corresponding WebSocket service on the back-end:</p>
+<p> <a target="_blank" rel="noopener" href="https://github.com/Gameckh/CollaborativeDemo_BackEnd/blob/master/src/main/java/GcExcelServer/SpreadJSSocketHandler.java">SpreadJSSocketHandler.java</a></p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleTextMessage</span><span class="params">(WebSocketSession session, TextMessage message)</span></span></span><br><span class="line"><span class="function">    <span class="keyword">throws</span> InterruptedException, IOException </span>&#123;</span><br><span class="line">    Map value = <span class="keyword">new</span> Gson().fromJson(message.getPayload(), Map.class);</span><br><span class="line">    String cmd = (String) value.get(<span class="string">&quot;cmd&quot;</span>);</span><br><span class="line">    <span class="keyword">if</span>(cmd == <span class="keyword">null</span>)&#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    String docID = (String) value.get(<span class="string">&quot;docID&quot;</span>);</span><br><span class="line">    <span class="keyword">if</span> (<span class="string">&quot;connect&quot;</span>.equals(cmd.toLowerCase())) &#123;</span><br><span class="line">        List&lt;WebSocketSession&gt; sessions = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">if</span> (docSessions.containsKey(docID)) &#123;</span><br><span class="line">            sessions = docSessions.get(docID);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            sessions = Collections.synchronizedList(<span class="keyword">new</span> ArrayList&lt;WebSocketSession&gt;());</span><br><span class="line">            docSessions.put(docID, sessions);</span><br><span class="line">        &#125;</span><br><span class="line">        sessions.add(session);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        List&lt;WebSocketSession&gt; sessions = docSessions.get(docID);</span><br><span class="line">        <span class="keyword">for</span> (WebSocketSession webSocketSession : sessions) &#123;</span><br><span class="line">            <span class="keyword">if</span>(webSocketSession.getId() != session.getId() &amp;&amp;</span><br><span class="line">                webSocketSession.isOpen()) &#123;</span><br><span class="line">                webSocketSession.sendMessage(message);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> Set the expiration time for WebSocket. Cease sending WebSocket requests to the endpoint 5 minutes after the session is closed:</p>
+<p> <a target="_blank" rel="noopener" href="https://github.com/Gameckh/CollaborativeDemo_BackEnd/blob/master/src/main/java/GcExcelServer/SpreadJSSocketHandler.java">SpreadJSSocketHandler.java</a></p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">SpreadJSSocketHandler</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="comment">// clean up the closed session every 5 minutes</span></span><br><span class="line">    Timer timer = <span class="keyword">new</span> Timer(<span class="string">&quot;cleanClosedSession&quot;</span>);</span><br><span class="line">    timer.schedule(<span class="keyword">new</span> TimerTask() &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            Collection&lt;List&lt;WebSocketSession&gt;&gt; sessionsList = docSessions.values();</span><br><span class="line">            <span class="keyword">for</span>(List&lt;WebSocketSession&gt; sessions: sessionsList) &#123;</span><br><span class="line">                ArrayList&lt;WebSocketSession&gt; closedSessions = <span class="keyword">new</span> ArrayList&lt;WebSocketSession&gt;();</span><br><span class="line">                <span class="keyword">for</span>(WebSocketSession session: sessions)&#123;</span><br><span class="line">                    <span class="keyword">if</span>(!session.isOpen())&#123;</span><br><span class="line">                        closedSessions.add(session);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                sessions.removeAll(closedSessions);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;, <span class="number">5</span>*<span class="number">60</span>*<span class="number">1000</span>,<span class="number">5</span>*<span class="number">60</span>*<span class="number">1000</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> Front-end sending requests to the back-end:</p>
+<p> <a target="_blank" rel="noopener" href="https://github.com/Gameckh/CollaborativeDemo_FrontEnd/blob/master/src/components/Spreadsheet.js">Spreadsheet.js</a></p>
+ <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(ServerCommand != <span class="literal">null</span>)&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> cmd = command.cmd;</span><br><span class="line">    <span class="keyword">var</span> dotIndex = cmd.lastIndexOf(<span class="string">&#x27;.&#x27;</span>);</span><br><span class="line">    <span class="keyword">if</span>(dotIndex !== -<span class="number">1</span>)&#123;</span><br><span class="line">        cmd = cmd.substring(dotIndex + <span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    ServerCommand.cmd = cmd;</span><br><span class="line">    ServerCommand.docID = <span class="built_in">this</span>.docName;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Front-end sending requests to the back-end.</span></span><br><span class="line">    Utility.ExecuteCommandAtServer(ServerCommand);</span><br><span class="line"></span><br><span class="line">    command.docID = ServerCommand.docID;</span><br><span class="line">    <span class="built_in">this</span>.webSocket.send(<span class="built_in">JSON</span>.stringify(command))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> After receiving a request from the back-end, revise the corresponding implementation based on the request. In the demo, encapsulation was applied to improve the structure’s rationale and facilitate rewriting.</p>
+<p> <a target="_blank" rel="noopener" href="https://github.com/Gameckh/CollaborativeDemo_BackEnd/blob/master/src/main/java/GcExcelServer/ServerCommands/SetFontWeightCommand.java">SetFontWeightCommand.java</a></p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> GcExcelServer.ServerCommands;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.grapecity.documents.excel.IWorksheet;</span><br><span class="line"><span class="keyword">import</span> com.grapecity.documents.excel.Workbook;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SetFontWeightCommand</span> <span class="keyword">extends</span> <span class="title">SelectionCommandBase</span></span>&#123;</span><br><span class="line">  <span class="keyword">private</span> Object value;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">getValue</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.value;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setValue</span><span class="params">(Object value)</span></span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.value = value;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">(Workbook workbook)</span> </span>&#123;</span><br><span class="line">        IWorksheet worksheet = <span class="keyword">this</span>.getWorksheet(workbook);</span><br><span class="line">        <span class="keyword">if</span>(worksheet == <span class="keyword">null</span>)&#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span>(SJSRange range: <span class="keyword">this</span>.getSelections())&#123;</span><br><span class="line">          <span class="keyword">if</span>(<span class="string">&quot;normal&quot;</span>.equals(value)) &#123;</span><br><span class="line">            worksheet.getRange(range.getRow(),range.getCol(),range.getRowCount(), range.getColCount()).getFont().setBold(<span class="keyword">false</span>);</span><br><span class="line">          &#125;</span><br><span class="line">          <span class="keyword">if</span>(<span class="string">&quot;bold&quot;</span>.equals(value)) &#123;</span><br><span class="line">            worksheet.getRange(range.getRow(),range.getCol(),range.getRowCount(), range.getColCount()).getFont().setBold(<span class="keyword">true</span>);</span><br><span class="line">          &#125;</span><br><span class="line">            </span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> Subsequently, load the same document in the GCExcel at the back-end and execute the aforementioned operations:</p>
+<p> <a target="_blank" rel="noopener" href="https://github.com/Gameckh/CollaborativeDemo_BackEnd/blob/master/src/main/java/GcExcelServer/Controllers/GcExcelController.java">GcExcelController.java</a></p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RequestMapping(value = &quot;/setFontSize&quot;, method = RequestMethod.POST)</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setFontSize</span><span class="params">(HttpServletRequest request,</span></span></span><br><span class="line"><span class="params"><span class="function">                          <span class="meta">@RequestBody</span> SetFontSizeCommand setFontSizeCommand,</span></span></span><br><span class="line"><span class="params"><span class="function">                          HttpServletResponse response)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">this</span>.executeCommand(setFontSizeCommand, response);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@RequestMapping(value = &quot;/setBackColor&quot;, method = RequestMethod.POST)</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setBackColor</span><span class="params">(HttpServletRequest request,</span></span></span><br><span class="line"><span class="params"><span class="function">                        <span class="meta">@RequestBody</span> SetBackColorCommand setBackColorCommand,</span></span></span><br><span class="line"><span class="params"><span class="function">                        HttpServletResponse response)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">this</span>.executeCommand(setBackColorCommand, response);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@RequestMapping(value = &quot;/setForeColor&quot;, method = RequestMethod.POST)</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setForeColor</span><span class="params">(HttpServletRequest request,</span></span></span><br><span class="line"><span class="params"><span class="function">                        <span class="meta">@RequestBody</span> SetForeColorCommand setForeColorCommand,</span></span></span><br><span class="line"><span class="params"><span class="function">                        HttpServletResponse response)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">this</span>.executeCommand(setForeColorCommand, response);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@RequestMapping(value = &quot;/moveFloatingObjects&quot;, method = RequestMethod.POST)</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">moveFloatingObjects</span><span class="params">(HttpServletRequest request,</span></span></span><br><span class="line"><span class="params"><span class="function">                          <span class="meta">@RequestBody</span> MoveFloatingObjectsCommand movingFloatingObjectsCommand,</span></span></span><br><span class="line"><span class="params"><span class="function">                          HttpServletResponse response)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">this</span>.executeCommand(movingFloatingObjectsCommand, response);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@RequestMapping(value = &quot;/resizeFloatingObjects&quot;, method = RequestMethod.POST)</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">resizeFloatingObjects</span><span class="params">(HttpServletRequest request,</span></span></span><br><span class="line"><span class="params"><span class="function">                                  <span class="meta">@RequestBody</span> ResizeFloatingObjectsCommand resizingFloatingObjectsCommand,</span></span></span><br><span class="line"><span class="params"><span class="function">                                  HttpServletResponse response)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">this</span>.executeCommand(resizingFloatingObjectsCommand, response);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@RequestMapping(value = &quot;/insertColumns&quot;, method = RequestMethod.POST)</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">insertColumns</span><span class="params">(HttpServletRequest request,</span></span></span><br><span class="line"><span class="params"><span class="function">                                  <span class="meta">@RequestBody</span> InsertColumnsCommand insertColumnsCommand,</span></span></span><br><span class="line"><span class="params"><span class="function">                                  HttpServletResponse response)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">this</span>.executeCommand(insertColumnsCommand, response);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> The purpose of this activity is to preserve previous results after refreshing, and in the event that the collaborative end opens the document later, it allows for missed operations to be made up for.</p>
+</li>
+</ol>
+<h3 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h3><p>Collaborative documents form a vastly complex domain, offering numerous topics for discussion. The content above shared this time is based on demonstration purposes, hoping to convey a fundamental implementation approach. Subsequent related topics, such as permission control, version control, command scheduling, conflict resolution, etc., will be addressed in forthcoming articles. Please stay tuned.</p>
+
+
+                <hr>
+
+                
+
+                <ul class="pager">
+                    
+                        <li class="previous">
+                            <a href="/2023/02/28/share-show-product-feature-with-video-clip/" data-toggle="tooltip" data-placement="top" title="How to show product features in a 2 minutes video clip">&larr; Previous Post</a>
+                        </li>
+                    
+                    
+                        <li class="next">
+                            <a href="/2022/11/28/fc-Scenario-of-Financial-Industry-Indicator-Supplementation/" data-toggle="tooltip" data-placement="top" title="【公开课】金融行业指标补录场景分析与解决方案">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                
+
+                
+
+            </div>
+    <!-- Side Catalog Container -->
+        
+
+    <!-- Sidebar Container -->
+
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#collaborative documents" title="collaborative documents">collaborative documents</a>
+                        
+                          <a class="tag" href="/tags/#React" title="React">React</a>
+                        
+                          <a class="tag" href="/tags/#SpringBoot" title="SpringBoot">SpringBoot</a>
+                        
+                          <a class="tag" href="/tags/#SpreadJS" title="SpreadJS">SpreadJS</a>
+                        
+                          <a class="tag" href="/tags/#GcExcel" title="GcExcel">GcExcel</a>
+                        
+                          <a class="tag" href="/tags/#WebSocket" title="WebSocket">WebSocket</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+            </div>
+
+        </div>
+    </div>
+</article>
+
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'always',
+          placement: 'right',
+          icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://www.linkedin.com/in/kevin-chenkaihua">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://github.com/Gameckh">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://www.instagram.com/kevin.chenkh">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-instagram fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; KevinChen&#39;s Blog 2023
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+
+<script src="/js/jquery.min.js"></script>
+
+
+<!-- Bootstrap Core JavaScript -->
+
+<script src="/js/bootstrap.min.js"></script>
+
+
+<!-- Custom Theme JavaScript -->
+
+<script src="/js/hux-blog.min.js"></script>
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("https://gameckh.github.io/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+
+
+<!-- Baidu Tongji -->
+
+
+<!-- Side Catalog -->
+
+
+<div id="totop" style="position:fixed;bottom:50px;right:30px;">
+  <a title="返回顶部"><img style="cursor: pointer;" src="/img/scrollup.png"/></a>
+</div>
+
+<script src="/js/totop.js"></script>
+
+
+
+<!-- Image to hack wechat -->
+<img src="https://gameckh.github.io/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword"  content="">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+          Experiencing React&#39;s Concurrent Features - KevinChen&#39;s Blog
+        
+    </title>
+
+    <link rel="canonical" href="https://gameckh.github.io/2021/09/16/tech-Experiencing-React-Concurrent-Features/">
+
+    <!-- Bootstrap Core CSS -->
+    
+<link rel="stylesheet" href="/css/bootstrap.min.css">
+
+
+    <!-- Custom CSS -->
+    
+<link rel="stylesheet" href="/css/hux-blog.min.css">
+
+
+    <!-- Pygments Highlight CSS -->
+    
+<link rel="stylesheet" href="/css/highlight.css">
+
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">KevinChen&#39;s Blog</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About My Blog</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archives/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    
+<!-- Image to hack wechat -->
+<!-- <img src="https://gameckh.github.io/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="{{ site.baseurl }}/{% if page.header-img %}{{ page.header-img }}{% else %}{{ site.header-img }}{% endif %}" width="0" height="0"> -->
+
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        background-image: url('post-bg.jpg')
+    }
+</style>
+<header class="intro-header" >
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                          <a class="tag" href="/tags/#React" title="React">React</a>
+                        
+                    </div>
+                    <h1>Experiencing React&#39;s Concurrent Features</h1>
+                    <h2 class="subheading">The era of front-end concurrency has already dawned - Concurrent Mode and Suspense of React 17</h2>
+                    <span class="meta">
+                        Posted by Kevin on
+                        2021-09-16
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <blockquote>
+<p>React 17 was released in October 2020, surprisingly with ‘no new features’. Of course, this doesn’t truly indicate the absence of any new additions that excite the vast array of programmers and users. In truth, this version introduced numerous significant feature upgrades, bug fixes for version 16, and launched the Concurrent Mode and Suspense.<br>I was invited to compose this piece to share my impressions of React’s new features. This article is published under the name of the ‘GrapeCity Technical Team’ on the CNBlogs, with the original address as follows: <a target="_blank" rel="noopener" href="https://www.cnblogs.com/powertoolsteam/p/14958856.html">https://www.cnblogs.com/powertoolsteam/p/14958856.html</a></p>
+</blockquote>
+<p>React is an open-source JavaScript library empowering developers to create web and mobile-based applications, supporting the construction of interactive user interfaces and UI components. Conceived by Facebook’s software engineer Jordan Walke, the premier version of React was launched seven years ago and is currently maintained by Facebook. Since its initial release, React’s popularity has skyrocketed and shows no signs of cooling down.</p>
+<p>In brief, the Concurrent Mode and Suspense enable users to seamlessly handle data loading, loading states, and smooth, uninterrupted user interface operations. Under Concurrent Mode, React can pause the rendering of high-consuming, non-urgent components, focusing more on pressing tasks such as UI rendering, thereby maintaining the application’s reactivity and avoiding phenomena like blank screens and lags.</p>
+<p>This article primarily shares a profound understanding of data fetching functionality under Concurrent Mode and Suspense.</p>
+<h3 id="Why-is-Concurrent-Mode-Required"><a href="#Why-is-Concurrent-Mode-Required" class="headerlink" title="Why is Concurrent Mode Required?"></a>Why is Concurrent Mode Required?</h3><p>As is widely known, JavaScript operates on a single thread. Hence, when one block of code is running, the rest must wait for execution. It is impossible to concurrently execute multi-threaded tasks. The same goes for interface rendering.</p>
+<p>Once React commences rendering something, it can’t be interrupted until it has fully executed. React developers refer to this kind of rendering as ‘blocking rendering.’ This blocking rendering creates an unstable user interface that might cease to respond at any given moment.</p>
+<h3 id="Some-Specific-Issues"><a href="#Some-Specific-Issues" class="headerlink" title="Some Specific Issues"></a>Some Specific Issues</h3><p>Suppose we need to display a lengthy selectable list for an application meant to filter products. We use a search box to filter records, and the design scheme is such that when a user clicks the search button, the user interface needs to refresh and list the associated data.</p>
+<p>If the list is too long or the data too extensive, the UI ‘lags,’ making the rendering visible to users. This kind of lag can significantly reduce product performance. Developers can use techniques like throttling and debouncing, which offer some help, but they are not perfect solutions.<br>Throttling limits the number of times a specific function can be called. Using throttling, we can avoid repeatedly calling costly and time-consuming APIs or functions. This process can enhance performance, especially when presenting information on the user interface.</p>
+<p>Debouncing ignores calls to a function within a predetermined time. Function calls are made only after the preset time has elapsed.</p>
+<p>The following diagram describes the lag phenomenon:<br>While waiting for a non-urgent API call to complete, the UI lags, thereby preventing the user interface from rendering. The solution is to use concurrent mode for interruptible rendering.</p>
+<p><img src="001.jpg"></p>
+<h3 id="Interruptible-Rendering"><a href="#Interruptible-Rendering" class="headerlink" title="Interruptible Rendering"></a>Interruptible Rendering</h3><p>Through interruptible rendering, React.js doesn’t block the UI while processing and re-rendering the list. By pausing trivial tasks, updating the DOM, and ensuring the UI doesn’t lag, React.js becomes more refined. React executes parallel updates or redraws the input box using user input. </p>
+<p>It also updates the list in the memory. After React completes the updates, it updates the DOM and re-renders the list on the user’s display. Essentially, interruptible rendering enables React to ‘multitask.’ This feature offers a smoother UI experience.</p>
+<h3 id="Concurrent-Mode"><a href="#Concurrent-Mode" class="headerlink" title="Concurrent Mode"></a>Concurrent Mode</h3><p>Concurrent mode is a set of features that help React applications remain responsive and smoothly adapt to the user’s device capabilities and network speed. Concurrent Mode breaks down its tasks into smaller chunks. React’s scheduler can pick and choose the jobs to execute. The scheduling of jobs depends on their priority. By prioritizing tasks, it can halt trivial or non-urgent matters or further push them. React always puts user interface updates and rendering at the forefront.</p>
+<p>Using concurrent mode, we can:</p>
+<ul>
+<li>Control the initial rendering process</li>
+<li>Prioritize the rendering process</li>
+<li>Pause and resume component rendering</li>
+<li>Cache and optimize component runtime rendering</li>
+<li>Conceal display content until it needs to be shown</li>
+</ul>
+<p>Concurrent Mode enhances the response to incoming data, lazy loading of controls, and asynchronous processing along with UI rendering. It ensures that the user interface is always active and continually updates data in the background. Concurrent Mode consistently uses two of React’s hooks: useTransition and useDeferredValue.</p>
+<h3 id="Using-the-useDeferredValue-Hook"><a href="#Using-the-useDeferredValue-Hook" class="headerlink" title="Using the useDeferredValue Hook"></a>Using the useDeferredValue Hook</h3><p>The definition of the useDeferredValue Hook is as follows:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> deferredValue = useDeferredValue(value, &#123; <span class="attr">timeoutMs</span>: <span class="xml"><span class="tag">&lt;<span class="name">some</span> <span class="attr">value</span>&gt;</span> &#125;);</span></span><br></pre></td></tr></table></figure>
+
+<p>This command sets the value to ‘lag’ after the time set in timeoutMs. Whether the user interface must be updated immediately or must wait for data, this command keeps the user interface active and responsive. This hook prevents the UI from lagging, continually maintaining user interface responsiveness, all while keeping the minor cost of data fetching latency.</p>
+<h3 id="Using-Transition-Hook"><a href="#Using-Transition-Hook" class="headerlink" title="Using Transition Hook"></a>Using Transition Hook</h3><p>The useTransition Hook is primarily used for suspensions in React. Consider a scenario where there is a webpage with a button that has a username. Just by clicking a button, the webpage will display the user’s detailed information on the screen.</p>
+<p>Suppose a user first clicks one button and then the next. The screen either turns blank, or we see a spinner on the screen. If fetching the details takes too long, the user interface might freeze.<br>The useTransition method returns the values of two hooks: startTransition and isPending. The syntax is defined as follows:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> [startTransition, isPending] = useTransition(&#123; <span class="attr">timeoutMs</span>: <span class="number">3000</span> &#125;);</span><br></pre></td></tr></table></figure>
+
+<p>The syntax defined for startTransition is as follows:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;button disabled=&#123;isPending&#125;  </span><br><span class="line">startTransition(<span class="function">() =&gt;</span> &#123;  </span><br><span class="line">    <span class="xml"><span class="tag">&lt;<span class="name">fetch</span> <span class="attr">Calls</span>&gt;</span>  </span></span><br><span class="line"><span class="xml">&#125;);  </span></span><br><span class="line"><span class="xml"><span class="tag">&lt;/<span class="name">button</span>&gt;</span></span>  </span><br><span class="line">&#123;isPending? <span class="string">&quot; Loading...&quot;</span>: <span class="literal">null</span>&#125;  </span><br></pre></td></tr></table></figure>
+<p>By using the useTransition hook, React.js continues to display the user interface without user details until the user details are ready, but the UI remains responsive. React prioritizes the user interface to maintain responsiveness while data is fetched in parallel.</p>
+<h3 id="Suspense-for-Data-Fetching"><a href="#Suspense-for-Data-Fetching" class="headerlink" title="Suspense for Data Fetching"></a>Suspense for Data Fetching</h3><p>Suspense is another experimental feature introduced alongside Concurrent Mode in React. Suspense allows components to wait for a predetermined period before rendering.</p>
+<p>The primary function of Suspense is to read data asynchronously from components without worrying about the data source. Suspense is most suited to the concept of lazy loading. Suspense enables data fetching libraries to notify React whether the data component is ready for use. React won’t update the UI until the necessary components are ready.</p>
+<p>The benefits of using Suspense include:</p>
+<ol>
+<li>Integration between data fetching libraries and React components</li>
+<li>Control over visual loading states</li>
+<li>Avoidance of race conditions.</li>
+</ol>
+<p>The basic syntax for the Spinner component is as follows:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> Spinner <span class="keyword">from</span> <span class="string">&#x27;./Spinner&#x27;</span>;  </span><br><span class="line">    <span class="xml"><span class="tag">&lt;<span class="name">Suspense</span> <span class="attr">fallback</span>=<span class="string">&#123;</span>&lt;<span class="attr">Spinner</span> /&gt;</span>&#125;&gt;  </span></span><br><span class="line"><span class="xml">      <span class="tag">&lt;<span class="name">SomeComponent</span> /&gt;</span>  </span></span><br><span class="line"><span class="xml"><span class="tag">&lt;/<span class="name">Suspense</span>&gt;</span></span></span><br></pre></td></tr></table></figure>
+
+<p>Suspense, as used in Concurrent Mode, permits time-consuming components to commence rendering while simultaneously waiting for data, also displaying placeholders. This combination results in a more seamless UI experience.</p>
+<h3 id="Suspense-and-Lazy-Loading-Components"><a href="#Suspense-and-Lazy-Loading-Components" class="headerlink" title="Suspense and Lazy Loading Components"></a>Suspense and Lazy Loading Components</h3><p>React.lazy is a new feature that allows React.js to lazily load components. Lazy loading means loading components (retrieving and rendering their code) only when they are needed. They prioritize the most critical user interface components. React developers recommend wrapping lazy-loaded components in a Suspense component.</p>
+<p>Doing so ensures that the components do not encounter a ‘bad state’ during rendering. The user interface remains responsive throughout the process, resulting in a smoother user experience.</p>
+<h3 id="Enabling-Concurrent-Mode"><a href="#Enabling-Concurrent-Mode" class="headerlink" title="Enabling Concurrent Mode"></a>Enabling Concurrent Mode</h3><p>To enable Concurrent Mode, install the latest experimental version. The prerequisite for installing React is the Node Package Manager (npm). To install the experimental version, execute the following command:</p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install react@experimental react-dom@experimental</span><br></pre></td></tr></table></figure>
+
+<p>To test whether the experimental version is set up, create a sample React application. The rendering code without the experimental feature is as follows:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> * <span class="keyword">as</span> React <span class="keyword">from</span> <span class="string">&#x27;react&#x27;</span>;  </span><br><span class="line"><span class="keyword">import</span> &#123; render &#125; <span class="keyword">from</span> <span class="string">&#x27;react-dom&#x27;</span>;  </span><br><span class="line">render(<span class="xml"><span class="tag">&lt;<span class="name">App</span> /&gt;</span></span>, <span class="built_in">document</span>.getElementById(<span class="string">&#x27;root&#x27;</span>));</span><br></pre></td></tr></table></figure>
+
+<p>The specific code for Concurrent Mode is as follows:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> * <span class="keyword">as</span> React <span class="keyword">from</span> <span class="string">&#x27;react&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; createRoot &#125; <span class="keyword">from</span> <span class="string">&#x27;react-dom&#x27;</span>;</span><br><span class="line">createRoot(<span class="built_in">document</span>.getElementById(<span class="string">&#x27;root&#x27;</span>)).render(<span class="xml"><span class="tag">&lt;<span class="name">App</span> /&gt;</span></span>);</span><br></pre></td></tr></table></figure>
+
+<p>This will enable Concurrent Mode for the entire application. React splits the rendering call into two parts:</p>
+<ol>
+<li>The creation of a root element</li>
+<li>The use of the render call</li>
+</ol>
+<p>Currently, React plans to maintain three modes:</p>
+<ol>
+<li>Legacy Mode is the backward-compatible traditional or current mode</li>
+<li>Blocking Mode is an intermediate stage of Concurrent Mode development</li>
+<li>Concurrent Mode</li>
+</ol>
+<p>Blocking Mode replaces the createRoot call with the createBlockingRoot call. In the context of Concurrent Mode development, Blocking Mode provides developers with an opportunity to fix bugs or resolve issues.</p>
+<p>The official React documentation also outlines the features supported by each mode:</p>
+<p><img src="002.jpg"></p>
+<h3 id="Example-Application"><a href="#Example-Application" class="headerlink" title="Example Application:"></a>Example Application:</h3><p>This article also creates a test program to verify the usage and effects of Concurrent Mode and other modes. Taking a pixel application as an example, it randomly distributes pixels on a 150*150 canvas and includes a search box. Each time a user clicks on the search box, the canvas re-renders itself.</p>
+<p>Even if the UI interface cannot render under Concurrent Mode, user input continues to update. The pixel canvas re-renders after processing is completed. In Legacy Mode, the UI stops when typing quickly, and sometimes stops before re-rendering the canvas. User input also stops and does not update.</p>
+<p>The main file for building the pixel application is canvas.js. We also made an input box where users can type anything. Each keystroke re-renders the pixel canvas.</p>
+<h3 id="Code-Example"><a href="#Code-Example" class="headerlink" title="Code Example:"></a>Code Example:</h3><p>index.js</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> React <span class="keyword">from</span> <span class="string">&quot;react&quot;</span>;  </span><br><span class="line"><span class="keyword">import</span> ReactDOM <span class="keyword">from</span> <span class="string">&quot;react-dom&quot;</span>;  </span><br><span class="line"><span class="keyword">import</span> App <span class="keyword">from</span> <span class="string">&quot;./App&quot;</span>;  </span><br><span class="line"><span class="comment">// Traditional or non-Concurrent Mode react  </span></span><br><span class="line"><span class="keyword">const</span> rootTraditional = <span class="built_in">document</span>.getElementById(<span class="string">&quot;root&quot;</span>);  </span><br><span class="line">ReactDOM.render(<span class="xml"><span class="tag">&lt;<span class="name">App</span> <span class="attr">caption</span>=<span class="string">&quot;Traditional or Block Rendering&quot;</span> /&gt;</span></span>,  </span><br><span class="line">rootTraditional);  </span><br><span class="line"><span class="comment">// Concurrent Mode enabled  </span></span><br><span class="line"><span class="keyword">const</span> rootConcurrent = <span class="built_in">document</span>.getElementById(<span class="string">&quot;root-concurrent&quot;</span>);  </span><br><span class="line">ReactDOM.createRoot(rootConcurrent).render(<span class="xml"><span class="tag">&lt;<span class="name">App</span> <span class="attr">caption</span>=<span class="string">&quot;Interruptible  </span></span></span></span><br><span class="line"><span class="string"><span class="tag"><span class="xml">Rendering&quot;</span>   /&gt;</span></span>);</span><br></pre></td></tr></table></figure>
+
+<p>App.js</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> React, &#123; useState, useDeferredValue &#125; <span class="keyword">from</span> <span class="string">&quot;react&quot;</span>;  </span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;./App.css&quot;</span>;  </span><br><span class="line"><span class="keyword">import</span> &#123; Canvas &#125; <span class="keyword">from</span> <span class="string">&quot;./Canvas&quot;</span>;  </span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="function"><span class="keyword">function</span> <span class="title">App</span>(<span class="params">props</span>)  </span></span><br><span class="line"><span class="function"></span>&#123; <span class="keyword">const</span> [value, setValue] = useState(<span class="string">&quot;&quot;</span>);  </span><br><span class="line"><span class="comment">//This is available only in the Concurrent mode.</span></span><br><span class="line"><span class="keyword">const</span> deferredValue = useDeferredValue(value, &#123;  </span><br><span class="line">    <span class="attr">timeoutMs</span>: <span class="number">5000</span>  </span><br><span class="line">&#125;);  </span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> keyPressHandler = <span class="function"><span class="params">e</span> =&gt;</span> &#123;  </span><br><span class="line">    setValue(e.target.value);  </span><br><span class="line">&#125;;  </span><br><span class="line"></span><br><span class="line"><span class="keyword">return</span> (  </span><br><span class="line">    <span class="xml"><span class="tag">&lt;<span class="name">div</span> <span class="attr">className</span>=<span class="string">&quot;App&quot;</span>&gt;</span>  </span></span><br><span class="line"><span class="xml">    <span class="tag">&lt;<span class="name">h1</span>&gt;</span>&#123;props.caption&#125;<span class="tag">&lt;/<span class="name">h1</span>&gt;</span>  </span></span><br><span class="line"><span class="xml">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">onKeyUp</span>=<span class="string">&#123;keyPressHandler&#125;</span> /&gt;</span>  </span></span><br><span class="line"><span class="xml">    <span class="tag">&lt;<span class="name">Canvas</span> <span class="attr">value</span>=<span class="string">&#123;deferredValue&#125;</span> /&gt;</span>  </span></span><br><span class="line"><span class="xml">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span>  </span><br><span class="line">);  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Canvas.js</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> React <span class="keyword">from</span> <span class="string">&quot;react&quot;</span>;  </span><br><span class="line"><span class="keyword">const</span> CANVAS_SIZE = <span class="number">70</span>;  </span><br><span class="line"><span class="keyword">const</span> generateRandomColor = <span class="function">() =&gt;</span> &#123;  </span><br><span class="line"><span class="keyword">var</span> letters = <span class="string">&quot;0123456789ABCDEF&quot;</span>;  </span><br><span class="line"><span class="keyword">var</span> color = <span class="string">&quot;#&quot;</span>;  </span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; <span class="number">6</span>; i++) &#123;  </span><br><span class="line">    color += letters[<span class="built_in">Math</span>.floor(<span class="built_in">Math</span>.random() * <span class="number">16</span>)];  </span><br><span class="line">&#125;  </span><br><span class="line"><span class="keyword">return</span> color;  </span><br><span class="line">&#125;;  </span><br><span class="line"><span class="keyword">const</span> createCanvas = <span class="function">(<span class="params">rows, columns</span>) =&gt;</span> &#123;  </span><br><span class="line"><span class="keyword">let</span> array = [];  </span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; rows; i++) &#123;  </span><br><span class="line">    <span class="keyword">let</span> row = [];  </span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">let</span> j = <span class="number">0</span>; j &lt; columns; j++) &#123;  </span><br><span class="line">    row.push(<span class="number">0</span>);  </span><br><span class="line">    &#125;  </span><br><span class="line">    array.push(row);  </span><br><span class="line">&#125;  </span><br><span class="line"><span class="keyword">return</span> array;  </span><br><span class="line">&#125;;  </span><br><span class="line"><span class="comment">//This is the square with the pixels  </span></span><br><span class="line"><span class="keyword">const</span> drawCanvas = <span class="function"><span class="params">value</span> =&gt;</span> &#123;  </span><br><span class="line"><span class="keyword">const</span> canvas = createCanvas(CANVAS_SIZE, CANVAS_SIZE);  </span><br><span class="line"><span class="keyword">return</span> canvas.map(<span class="function">(<span class="params">row, rowIndex</span>) =&gt;</span> &#123;  </span><br><span class="line">    <span class="keyword">let</span> cellsArrJSX = row.map(<span class="function">(<span class="params">cell, cellIndex</span>) =&gt;</span> &#123;  </span><br><span class="line">    <span class="keyword">let</span> key = rowIndex + <span class="string">&quot;-&quot;</span> + cellIndex;  </span><br><span class="line">    <span class="keyword">return</span> (  </span><br><span class="line">        <span class="xml"><span class="tag">&lt;<span class="name">div</span>  </span></span></span><br><span class="line"><span class="tag"><span class="xml">        <span class="attr">style</span>=<span class="string">&#123;&#123;</span> <span class="attr">backgroundColor:</span> <span class="attr">generateRandomColor</span>() &#125;&#125;  </span></span></span><br><span class="line"><span class="tag"><span class="xml">        <span class="attr">className</span>=<span class="string">&quot;cell&quot;</span>  </span></span></span><br><span class="line"><span class="tag"><span class="xml">        <span class="attr">key</span>=<span class="string">&#123;</span>&quot;<span class="attr">cell-</span>&quot; + <span class="attr">key</span>&#125;  </span></span></span><br><span class="line"><span class="tag"><span class="xml">        /&gt;</span></span>  </span><br><span class="line">    );  </span><br><span class="line">    &#125;);  </span><br><span class="line">    <span class="keyword">return</span> (  </span><br><span class="line">    <span class="xml"><span class="tag">&lt;<span class="name">div</span> <span class="attr">key</span>=<span class="string">&#123;</span>&quot;<span class="attr">row-</span>&quot; + <span class="attr">rowIndex</span>&#125; <span class="attr">className</span>=<span class="string">&quot;canvas-row&quot;</span>&gt;</span>  </span></span><br><span class="line"><span class="xml">        &#123;cellsArrJSX&#125;  </span></span><br><span class="line"><span class="xml">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span>  </span><br><span class="line">    );  </span><br><span class="line">&#125;);  </span><br><span class="line">&#125;;  </span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> Canvas = <span class="function">(<span class="params">&#123; value &#125;</span>) =&gt;</span> &#123;  </span><br><span class="line"><span class="keyword">return</span> (  </span><br><span class="line">    <span class="xml"><span class="tag">&lt;<span class="name">div</span>&gt;</span>  </span></span><br><span class="line"><span class="xml">    <span class="tag">&lt;<span class="name">h2</span> <span class="attr">style</span>=<span class="string">&#123;&#123;</span> <span class="attr">minHeight:</span> <span class="attr">30</span> &#125;&#125;&gt;</span>&#123;value&#125;<span class="tag">&lt;/<span class="name">h2</span>&gt;</span>  </span></span><br><span class="line"><span class="xml">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">className</span>=<span class="string">&quot;canvas&quot;</span>&gt;</span>&#123;drawCanvas(value)&#125;<span class="tag">&lt;/<span class="name">div</span>&gt;</span>  </span></span><br><span class="line"><span class="xml">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span>  </span><br><span class="line">);  </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>Index.html</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span>  </span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">&quot;en&quot;</span>&gt;</span>  </span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">&quot;utf-8&quot;</span> /&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span>  </span></span><br><span class="line"><span class="tag">    <span class="attr">name</span>=<span class="string">&quot;viewport&quot;</span>  </span></span><br><span class="line"><span class="tag">    <span class="attr">content</span>=<span class="string">&quot;width=device-width, initial-scale=1, shrink-to-fit=no&quot;</span>  </span></span><br><span class="line"><span class="tag">    /&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">&quot;theme-color&quot;</span> <span class="attr">content</span>=<span class="string">&quot;#000000&quot;</span> /&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>React App Concurrent Mode<span class="tag">&lt;/<span class="name">title</span>&gt;</span>  </span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span>  </span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;<span class="name">noscript</span>&gt;</span>  </span><br><span class="line">    You need to enable JavaScript to run this app.  </span><br><span class="line">    <span class="tag">&lt;/<span class="name">noscript</span>&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">&quot;container&quot;</span>&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">&quot;root&quot;</span> <span class="attr">class</span>=<span class="string">&quot;column&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">&quot;root-concurrent&quot;</span> <span class="attr">class</span>=<span class="string">&quot;column&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span>  </span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span>  </span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="Running-the-Example"><a href="#Running-the-Example" class="headerlink" title="Running the Example"></a>Running the Example</h3><p>Let’s take a look at our code. The first screen we see is the initial screen. Using traditional or block rendering is the current practice in React. Interruptible rendering is an experimental feature of Concurrent Mode. Let’s first look at how traditional rendering works.</p>
+<p><img src="003.jpg"></p>
+<p>The pixel canvas re-renders with each keystroke. In traditional rendering, the entire UI suspends with each keystroke until it can re-render the screen. During this time, user input does not update even if we continue to type.</p>
+<p>The image below shows interruptible rendering. In interruptible rendering, the user can continue to input. The UI does not suspend or stop while the canvas re-renders in parallel for each keystroke.</p>
+<p><img src="004.jpg"></p>
+<p>Once the re-rendering is complete, React updates the UI. Although this is hard to see in a static screenshot, we can observe that the grid changes, but the user can still type without experiencing any UI lag.</p>
+<p><img src="005.jpg"></p>
+<h3 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h3><p>In this article, we explored React’s experimental Concurrent Mode and Suspense. With Concurrent Mode, React.js always keeps the user interface responsive. It breaks down the tasks of the application into smaller chunks and allows for prioritization of user interface tasks. As a result, this mode can provide a smoother and seamless user experience, and improve the overall performance of the application.</p>
+<p>In combination with Concurrent Mode, Suspense allows the user interface to remain responsive. Meanwhile, data fetching and other heavy, time-consuming tasks can be completed in parallel, thereby providing an overall seamless experience.</p>
+<p>Complete details about Concurrent Mode can be found in the official React documentation.</p>
+
+
+                <hr>
+
+                
+
+                <ul class="pager">
+                    
+                        <li class="previous">
+                            <a href="/2021/10/22/tech-Implement-Short-Link-Generator/" data-toggle="tooltip" data-placement="top" title="How to Implement a Short Link Generator for Your Application">&larr; Previous Post</a>
+                        </li>
+                    
+                    
+                        <li class="next">
+                            <a href="/2021/06/30/rn-consultative-selling/" data-toggle="tooltip" data-placement="top" title="《顾问式销售》读书笔记">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                
+
+                
+
+            </div>
+    <!-- Side Catalog Container -->
+        
+
+    <!-- Sidebar Container -->
+
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#React" title="React">React</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+            </div>
+
+        </div>
+    </div>
+</article>
+
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'always',
+          placement: 'right',
+          icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://www.linkedin.com/in/kevin-chenkaihua">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://github.com/Gameckh">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://www.instagram.com/kevin.chenkh">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-instagram fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; KevinChen&#39;s Blog 2023
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+
+<script src="/js/jquery.min.js"></script>
+
+
+<!-- Bootstrap Core JavaScript -->
+
+<script src="/js/bootstrap.min.js"></script>
+
+
+<!-- Custom Theme JavaScript -->
+
+<script src="/js/hux-blog.min.js"></script>
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("https://gameckh.github.io/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+
+
+<!-- Baidu Tongji -->
+
+
+<!-- Side Catalog -->
+
+
+<div id="totop" style="position:fixed;bottom:50px;right:30px;">
+  <a title="返回顶部"><img style="cursor: pointer;" src="/img/scrollup.png"/></a>
+</div>
+
+<script src="/js/totop.js"></script>
+
+
+
+<!-- Image to hack wechat -->
+<img src="https://gameckh.github.io/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>
